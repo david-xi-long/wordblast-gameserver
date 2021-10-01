@@ -1,4 +1,5 @@
 {
 	"java.checkstyle.version": "9.0",
-	"java.checkstyle.configuration": "${workspaceFolder}\\checkstyle.xml"
+	"java.checkstyle.configuration": "${workspaceFolder}\\checkstyle.xml",
+	"java.format.settings.url": "formatter.xml"
 }

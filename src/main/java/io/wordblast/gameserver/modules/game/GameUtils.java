@@ -3,12 +3,12 @@ package io.wordblast.gameserver.modules.game;
 import io.wordblast.gameserver.modules.database.GameDao;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  * A utility class which contains various game related helper methods.
  */
-@Component
+@Service
 public final class GameUtils {
     @Autowired
     private GameDao gameDao;
@@ -54,7 +54,8 @@ public final class GameUtils {
     public Game getAvailableGame() {
         return GameManager.getGames()
                 .stream()
-                .filter((game) -> game.getStatus() == GameStatus.WAITING)
+                .filter((game) -> game.getStatus() == GameStatus.WAITING
+                        && game.getPlayers().size() < 8)
                 .findFirst()
                 .orElse(null);
     }

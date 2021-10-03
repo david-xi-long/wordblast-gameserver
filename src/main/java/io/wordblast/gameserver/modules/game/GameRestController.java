@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
  * The game REST endpoints.
  */
 @RestController
-public class GameController {
+public class GameRestController {
     @Autowired
     private GameUtils gameUtils;
 
@@ -18,7 +18,7 @@ public class GameController {
      * 
      * @return the available game.
      */
-    @GetMapping("/game/available")
+    @GetMapping("/api/game/available")
     public CompletableFuture<Game> getAvailableGame() {
         return gameUtils.getAvailableGameOrCreate();
     }

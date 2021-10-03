@@ -1,5 +1,7 @@
 package io.wordblast.gameserver.modules.game;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -9,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "games")
 public class Game {
     private final UUID uuid;
+    private final Set<Player> players = new HashSet<>();
     private GameStatus status;
 
     public Game() {
@@ -26,5 +29,9 @@ public class Game {
 
     public GameStatus getStatus() {
         return status;
+    }
+
+    public Set<Player> getPlayers() {
+        return players;
     }
 }

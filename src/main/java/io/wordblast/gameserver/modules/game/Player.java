@@ -2,7 +2,6 @@ package io.wordblast.gameserver.modules.game;
 
 import java.util.UUID;
 import java.net.Socket;
-import java.sql.SQLTransientConnectionException;
 
 /**
  * Represents a player within a game.
@@ -59,7 +58,7 @@ public class Player {
     public Socket getConnection() {
         return connection;
     } 
-    
+
     public void setConnection(Socket connection) {
         this.connection = connection;
     }

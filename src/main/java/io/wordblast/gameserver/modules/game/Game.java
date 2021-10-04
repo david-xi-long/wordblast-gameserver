@@ -16,7 +16,6 @@ public class Game {
     private GameOptions options;
     private GameStatus status;
     private Set<String> usedWords;
-    
     private Socket connection;
 
     public Game() {

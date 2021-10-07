@@ -1,9 +1,9 @@
 package io.wordblast.gameserver.modules.game;
 
+import java.net.Socket;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.net.Socket;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -16,7 +16,7 @@ public class Game {
     private GameOptions options;
     private GameStatus status;
     private Set<String> usedWords;
-    private Socket connection;
+    // private Socket connection;
 
     public Game() {
         this(UUID.randomUUID());
@@ -55,9 +55,9 @@ public class Game {
         usedWords.add(word);
     }
 
-    public Socket getConnection() {
-        return connection;
-    }
+    // public Socket getConnection() {
+    // return connection;
+    // }
 
     public void setGameOptions(GameOptions options) {
         this.options = options;

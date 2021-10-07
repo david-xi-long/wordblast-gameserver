@@ -1,5 +1,6 @@
 package io.wordblast.gameserver;
 
+import java.util.Map;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.mongo.MongoReactiveDataAutoConfiguration;
@@ -18,6 +19,10 @@ public class GameServerApplication {
      * @param args the arguments passed to the application.
      */
     public static void main(String[] args) {
-        SpringApplication.run(GameServerApplication.class, args);
+        SpringApplication application = new SpringApplication(GameServerApplication.class);
+
+        application.setDefaultProperties(Map.of("server.error.include-message", "always"));
+
+        application.run(args);
     }
 }

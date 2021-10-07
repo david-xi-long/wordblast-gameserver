@@ -1,7 +1,7 @@
 package io.wordblast.gameserver.modules.game;
 
-import java.util.UUID;
 import java.net.Socket;
+import java.util.UUID;
 
 /**
  * Represents a player within a game.
@@ -13,8 +13,8 @@ public class Player {
     private int lives;
     private int score;
     private boolean authenticated;
-    private Socket connection;
-    
+    // private Socket connection;
+
     public UUID getUuid() {
         return uuid;
     }
@@ -55,13 +55,11 @@ public class Player {
         return authenticated;
     }
 
-    public Socket getConnection() {
-        return connection;
-    } 
+    // public Socket getConnection() {
+    // return connection;
+    // }
 
-    public void setConnection(Socket connection) {
-        this.connection = connection;
-    }
-
-
+    // public void setConnection(Socket connection) {
+    // this.connection = connection;
+    // }
 }

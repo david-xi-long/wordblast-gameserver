@@ -8,13 +8,22 @@ public class GameOptions {
     private int livesPerPlayer;
     private int timePerPlayer;
 
-    // Default options to be adjusted
+    /**
+     * Creates a new game options object with the default values.
+     */
     public GameOptions() {
         maxPlayers = 8;
         livesPerPlayer = 3;
         timePerPlayer = 20;
     }
 
+    /**
+     * Creates a new game options object.
+     * 
+     * @param players the maximum player count of the game.
+     * @param lives the maximum lives of a player.
+     * @param time the maximum time of a round.
+     */
     public GameOptions(int players, int lives, int time) {
         maxPlayers = players;
         livesPerPlayer = lives;
@@ -44,5 +53,5 @@ public class GameOptions {
     public int getTimePerPlayer() {
         return timePerPlayer;
     }
-    
+
 }

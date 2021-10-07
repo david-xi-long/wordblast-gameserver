@@ -7,10 +7,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
- * The implementation of a user details service.
+ * The implementation of the user service.
  */
 @Service
-public class UserDetailsServiceImpl {
+public class UserService {
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -21,7 +21,6 @@ public class UserDetailsServiceImpl {
      * 
      * @param userDto the user data transfer object to extract data from.
      * @return the registered user, if successful.
-     * @throws UserAlreadyExistsException thrown if the user already has an existing account.
      */
     public CompletableFuture<User> registerUser(UserDto userDto) {
         return userRepository.findById(userDto.getEmail())

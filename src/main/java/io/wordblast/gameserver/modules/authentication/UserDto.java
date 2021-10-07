@@ -12,12 +12,11 @@ import javax.validation.constraints.Size;
 public class UserDto {
     @NotNull
     @NotEmpty
-    @Email
+    @Email(message = "Email must be in a valid format.")
     private String email;
     @NotNull
-    @Size(min = 8)
+    @Size(min = 8, message = "Password must contain 8 or more characters.")
     private String password;
-    @NotNull
     private String matchingPassword;
 
     public String getEmail() {

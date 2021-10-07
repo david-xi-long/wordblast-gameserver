@@ -5,10 +5,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.mongo.MongoReactiveDataAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoReactiveAutoConfiguration;
+import org.springframework.web.reactive.config.EnableWebFlux;
 
 /**
  * The main class of the application.
  */
+@EnableWebFlux
 @SpringBootApplication(exclude = {
     MongoReactiveAutoConfiguration.class, MongoReactiveDataAutoConfiguration.class
 })
@@ -21,7 +23,9 @@ public class GameServerApplication {
     public static void main(String[] args) {
         SpringApplication application = new SpringApplication(GameServerApplication.class);
 
-        application.setDefaultProperties(Map.of("server.error.include-message", "always"));
+        application.setDefaultProperties(Map.of(
+            "server.error.include-message", "always",
+            "spring.main.web-application-type", "reactive"));
 
         application.run(args);
     }

@@ -5,11 +5,13 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
@@ -18,19 +20,29 @@ import org.springframework.web.server.ResponseStatusException;
 @RestController
 public class AuthenticationRestController {
     @Autowired
-    private UserDetailsServiceImpl userDetailsService;
+    private UserService userService;
 
     /**
      * This endpoint will attempt to create a user account.
      * 
-     * @return the available game.
+     * @return the created user account.
      */
     @PostMapping("/api/user")
     public CompletableFuture<String> createUserAccount(@RequestBody @Valid UserDto userDto) {
-        return userDetailsService.registerUser(userDto)
-            .thenApply((newUser) -> {
-                return "Successfully created user. UID: " + newUser.getUid();
-            });
+        return userService.registerUser(userDto)
+            .thenApply((newUser) -> String.format("{\"uid\": \"%s\"}", newUser.getUid()));
+    }
+
+    /**
+     * This endpoint will retrieve the logged in user account of the session.
+     * 
+     * @return the logged in user account.
+     */
+    @GetMapping("/api/user")
+    public CompletableFuture<String> getUserAccount(@AuthenticationPrincipal UserDetailsImpl user) {
+        return CompletableFuture.completedFuture(
+            String.format("{\"authenticated\": %b, \"uid\": \"%s\"}", user != null,
+                user != null ? user.getUid() : null));
     }
 
     /**
@@ -41,14 +53,27 @@ public class AuthenticationRestController {
      */
     @ExceptionHandler()
     public ResponseEntity<String> handleExceptions(Exception ex) throws ResponseStatusException {
-        String errMessage = String.format("{\"error\": \"%s\"}", ex.getMessage());
+        HttpStatus status;
+        String exMessage;
 
         if (ex instanceof UserAlreadyExistsException) {
-            return new ResponseEntity<>(errMessage, HttpStatus.CONFLICT);
-        } else if (ex instanceof MethodArgumentNotValidException) {
-            return new ResponseEntity<>(errMessage, HttpStatus.BAD_REQUEST);
+            status = HttpStatus.CONFLICT;
+            exMessage = ex.getMessage();
+        } else if (ex instanceof UserNotFoundException) {
+            status = HttpStatus.BAD_REQUEST;
+            exMessage = ex.getMessage();
+        } else if (ex instanceof WebExchangeBindException) {
+            WebExchangeBindException bindEx = (WebExchangeBindException) ex;
+
+            status = HttpStatus.BAD_REQUEST;
+            exMessage = bindEx.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         } else {
-            return new ResponseEntity<>(errMessage, HttpStatus.INTERNAL_SERVER_ERROR);
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+            exMessage = ex.getMessage();
         }
+
+        String errMessage = String.format("{\"error\": \"%s\"}", exMessage);
+
+        return new ResponseEntity<>(errMessage, status);
     }
 }

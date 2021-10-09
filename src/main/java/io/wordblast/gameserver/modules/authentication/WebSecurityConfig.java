@@ -1,6 +1,6 @@
 package io.wordblast.gameserver.modules.authentication;
 
-import java.net.URI;
+import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -9,8 +9,8 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.authentication.RedirectServerAuthenticationSuccessHandler;
-import org.springframework.security.web.server.authentication.logout.RedirectServerLogoutSuccessHandler;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import reactor.core.publisher.Mono;
 
 /**
@@ -30,19 +30,28 @@ public class WebSecurityConfig {
         // TODO: Temporarily disable. Technically a security risk.
         http.csrf().disable();
 
-        RedirectServerAuthenticationSuccessHandler authSuccessHandler =
-            new RedirectServerAuthenticationSuccessHandler("http://localhost:3000/");
-        RedirectServerLogoutSuccessHandler logoutSuccessHandler =
-            new RedirectServerLogoutSuccessHandler();
-        logoutSuccessHandler.setLogoutSuccessUrl(URI.create("http://localhost:3000/"));
+        CorsConfiguration corsConfig = new CorsConfiguration();
+        corsConfig.setAllowCredentials(true);
+        corsConfig.setAllowedOrigins(List.of("http://localhost:3000"));
+        corsConfig.setAllowedMethods(List.of("GET", "POST"));
 
-        http.authorizeExchange()
+        UrlBasedCorsConfigurationSource source =
+            new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfig);
+
+        http.cors()
+            .configurationSource(source)
+            .and()
+            .authorizeExchange()
             .anyExchange()
             .permitAll()
             .and()
             .formLogin()
             .loginPage("/api/user/login")
-            .authenticationSuccessHandler(authSuccessHandler)
+            .authenticationSuccessHandler((exchange, exception) -> {
+                exchange.getExchange().getResponse().setStatusCode(HttpStatus.OK);
+                return Mono.empty();
+            })
             .authenticationFailureHandler((exchange, exception) -> {
                 exchange.getExchange().getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
                 return Mono.empty();
@@ -50,7 +59,10 @@ public class WebSecurityConfig {
             .and()
             .logout()
             .logoutUrl("/api/user/logout")
-            .logoutSuccessHandler(logoutSuccessHandler);
+            .logoutSuccessHandler((exchange, exception) -> {
+                exchange.getExchange().getResponse().setStatusCode(HttpStatus.OK);
+                return Mono.empty();
+            });
         return http.build();
     }
 

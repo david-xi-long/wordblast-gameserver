@@ -22,12 +22,12 @@ public class MongoConfig extends AbstractReactiveMongoConfiguration {
      * The database connection string for the development environment.
      */
     private static final String CONNECTION_STRING_DEV =
-            "mongodb://localhost:27017/" + DATABASE_NAME;
+        "mongodb://localhost:27017/" + DATABASE_NAME;
     /**
      * The database connection string for the production environment.
      */
     private static final String CONNECTION_STRING_PROD =
-            "mongodb://%s:%s@34.145.177.221:27017/" + DATABASE_NAME;
+        "mongodb://%s:%s@34.145.177.221:27017/" + DATABASE_NAME;
 
     @Autowired
     EnvProperties envProperties;
@@ -44,10 +44,10 @@ public class MongoConfig extends AbstractReactiveMongoConfiguration {
         String env = envProperties.getEnv();
 
         String connectionString = env.equals("DEV")
-                ? CONNECTION_STRING_DEV
-                : String.format(CONNECTION_STRING_PROD,
-                        mongoProperties.getUsername(),
-                        mongoProperties.getPassword());
+            ? CONNECTION_STRING_DEV
+            : String.format(CONNECTION_STRING_PROD,
+                mongoProperties.getUsername(),
+                mongoProperties.getPassword());
 
         builder.applyConnectionString(new ConnectionString(connectionString));
     }

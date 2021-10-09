@@ -4,12 +4,12 @@ import java.util.concurrent.CompletableFuture;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,8 +27,8 @@ public class AuthenticationRestController {
      * 
      * @return the created user account.
      */
-    @PostMapping("/api/user")
-    public CompletableFuture<String> createUserAccount(@RequestBody @Valid UserDto userDto) {
+    @PostMapping(path = "/api/user", consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE})
+    public CompletableFuture<String> createUserAccount(@Valid UserDto userDto) {
         return userService.registerUser(userDto)
             .thenApply((newUser) -> String.format("{\"uid\": \"%s\"}", newUser.getUid()));
     }

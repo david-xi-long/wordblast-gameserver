@@ -53,13 +53,18 @@ public final class GameUtils {
      */
     public Game getAvailableGame() {
         return GameManager.getGames()
-                .stream()
-                .filter((game) -> game.getStatus() == GameStatus.WAITING
-                        && game.getPlayers().size() < 8)
-                .findFirst()
-                .orElse(null);
+            .stream()
+            .filter((game) -> game.getStatus() == GameStatus.WAITING
+                && game.getPlayers().size() < 8)
+            .findFirst()
+            .orElse(null);
     }
 
+    /**
+     * Creates a game with the default settings.
+     * 
+     * @return the created game.
+     */
     public Game createDefaultGame() {
         return new Game();
     }

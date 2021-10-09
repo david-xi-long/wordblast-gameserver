@@ -27,7 +27,7 @@ public final class GameManager {
      * @param game the game to register.
      */
     public static void registerGame(final Game game) {
-        GAMES.put(game.getUuid(), game);
+        GAMES.put(game.getUid(), game);
     }
 
     /**
@@ -36,17 +36,17 @@ public final class GameManager {
      * @param game the game to unregister.
      */
     public static void unregisterGame(final Game game) {
-        GAMES.remove(game.getUuid());
+        GAMES.remove(game.getUid());
     }
 
     /**
      * Searches for the game with the associated unique identifier.
      *
-     * @param gameUuid the unique identifier of the game to search for.
+     * @param gameUid the unique identifier of the game to search for.
      * @return the retrieved game if found, otherwise {@code null}.
      */
-    public static Game getGame(final UUID gameUuid) {
-        return GAMES.get(gameUuid);
+    public static Game getGame(final UUID gameUid) {
+        return GAMES.get(gameUid);
     }
 
     /**

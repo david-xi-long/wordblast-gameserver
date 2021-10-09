@@ -11,7 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Document(collection = "games")
 public class Game {
-    private final UUID uuid;
+    private final UUID uid;
     private final Set<Player> players = new HashSet<>();
     private GameOptions options;
     private GameStatus status;
@@ -22,13 +22,13 @@ public class Game {
         this(UUID.randomUUID());
     }
 
-    public Game(final UUID uuid) {
-        this.uuid = uuid;
+    public Game(final UUID uid) {
+        this.uid = uid;
         this.status = GameStatus.WAITING;
     }
 
-    public UUID getUuid() {
-        return uuid;
+    public UUID getUid() {
+        return uid;
     }
 
     public GameStatus getStatus() {
@@ -66,6 +66,4 @@ public class Game {
     public GameOptions getGameOptions() {
         return options;
     }
-
-
 }

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.support.WebExchangeBindException;
-import org.springframework.web.server.ResponseStatusException;
 
 /**
  * The authentication REST endpoints.
@@ -51,8 +50,8 @@ public class AuthenticationRestController {
      * @param ex the exception to handle.
      * @return the result of the handled exception.
      */
-    @ExceptionHandler()
-    public ResponseEntity<String> handleExceptions(Exception ex) throws ResponseStatusException {
+    @ExceptionHandler
+    public ResponseEntity<String> handleExceptions(Exception ex) {
         HttpStatus status;
         String exMessage;
 

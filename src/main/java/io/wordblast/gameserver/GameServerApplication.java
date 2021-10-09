@@ -25,7 +25,9 @@ public class GameServerApplication {
 
         application.setDefaultProperties(Map.of(
             "server.error.include-message", "always",
-            "spring.main.web-application-type", "reactive"));
+            "spring.main.web-application-type", "reactive",
+            "spring.rsocket.server.port", "7000",
+            "spring.rsocket.server.transport", "websocket"));
 
         application.run(args);
     }

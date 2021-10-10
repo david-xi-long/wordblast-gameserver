@@ -1,22 +1,27 @@
 package io.wordblast.gameserver.modules.game;
 
-import java.net.Socket;
 import java.util.UUID;
+import org.springframework.messaging.rsocket.RSocketRequester;
 
 /**
  * Represents a player within a game.
  */
 public class Player {
-    private UUID uuid;
+    private final UUID uid = UUID.randomUUID();
+
     private String username;
     private boolean state;
     private int lives;
     private int score;
     private boolean authenticated;
-    // private Socket connection;
+    private RSocketRequester connection;
 
-    public UUID getUuid() {
-        return uuid;
+    public Player(String username) {
+        this.username = username;
+    }
+
+    public UUID getUid() {
+        return uid;
     }
 
     public String getUsername() {
@@ -55,11 +60,11 @@ public class Player {
         return authenticated;
     }
 
-    // public Socket getConnection() {
-    // return connection;
-    // }
+    public RSocketRequester getConnection() {
+        return connection;
+    }
 
-    // public void setConnection(Socket connection) {
-    // this.connection = connection;
-    // }
+    public void setConnection(RSocketRequester connection) {
+        this.connection = connection;
+    }
 }

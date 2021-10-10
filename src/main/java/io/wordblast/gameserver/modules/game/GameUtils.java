@@ -68,4 +68,31 @@ public final class GameUtils {
     public Game createDefaultGame() {
         return new Game();
     }
+
+    /**
+     * Attempts to retrieve an available game from the game manager. If none are found, create one.
+     * 
+     * @return the retrieved or created game.
+     */
+    public CompletableFuture<Game> createSinglePlayerGame() {
+        CompletableFuture<Game> gameFuture = new CompletableFuture<>();
+
+        // Create a new game with limit on one player
+        Game game = new Game();
+        GameOptions options = new GameOptions();
+        options.setMaxPlayers(1);
+        game.setGameOptions(options);
+        GameManager.registerGame(game);
+
+        // Duplicate game variable and assign it the final modifier, so the value does not
+        // change before the future is completed.
+        final Game gameFinal = game;
+
+        // Complete the game future once the game has been added to the database.
+        gameDao.createGame(game).thenRun(() -> gameFuture.complete(gameFinal));
+        return gameFuture;
+    }
+
+
+
 }

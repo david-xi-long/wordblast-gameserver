@@ -28,6 +28,16 @@ public class GameRestController {
     }
 
     /**
+     * This endpoint will create and return a new single player game.
+     * 
+     * @return the newly created game.
+     */
+    @GetMapping("/api/game/singlePlayer")
+    public CompletableFuture<Game> getSinglePlayerGame() {
+        return gameUtils.createSinglePlayerGame();
+    }
+
+    /**
      * This endpoint will attempt to return the requested game.
      * 
      * @param gameUid the unique identifier of the requested game.
@@ -38,4 +48,6 @@ public class GameRestController {
         Game game = GameManager.getGame(gameUid);
         return new ResponseEntity<>(game, game != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
+
+    
 }

@@ -4,11 +4,14 @@ import io.wordblast.gameserver.modules.game.packets.PacketInGameJoin;
 import io.wordblast.gameserver.modules.game.packets.PacketInSelectUsername;
 import io.wordblast.gameserver.modules.game.packets.PacketOutException;
 import io.wordblast.gameserver.modules.game.packets.PacketOutGameInfo;
+import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerState;
 import io.wordblast.gameserver.modules.game.packets.PacketOutSelectUsername;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
 
@@ -23,14 +26,49 @@ public class GameSocketController {
      * @param packet the join game packet sent from the client.
      * @return the game info packet sent to the client.
      */
-    @MessageMapping("join")
-    public Mono<PacketOutGameInfo> joinGame(PacketInGameJoin packet) {
+    @MessageMapping("join-game")
+    public Mono<PacketOutGameInfo> joinGame(PacketInGameJoin packet, RSocketRequester connection) {
         UUID gameUid = packet.getGameUid();
-        UUID playerUid = packet.getPlayerUid();
+        String username = packet.getUsername();
 
-        System.out.println("Game UID: " + gameUid + ", Player UID: " + playerUid);
+        Game game = GameManager.getGame(gameUid);
 
-        return Mono.just(new PacketOutGameInfo(gameUid, Set.of(playerUid)));
+        if (game == null) {
+            return Mono.error(new GameNotFoundException());
+        }
+
+        boolean usernameExists = game.getPlayers()
+            .stream()
+            .anyMatch((p) -> p.getUsername().equalsIgnoreCase(username));
+
+        if (usernameExists) {
+            return Mono.error(new UsernameTakenException());
+        }
+
+        Player player = new Player(username);
+        player.setConnection(connection);
+
+        game.addPlayer(player);
+
+        // When the player disconnects, set their state to false.
+        SocketUtils.handleDisconnect(connection, () -> {
+            player.setState(false);
+
+            PacketOutPlayerState statePacket =
+                new PacketOutPlayerState(player.getUsername(), false);
+
+            // Inform clients about the disconnect.
+            SocketUtils.sendPacket(game, "player-state", statePacket);
+        });
+
+        // This should be optimized later on, so that the player uids are not calculated
+        // every time someone attempts to join the game.
+        Set<String> playerNames = game.getPlayers()
+            .stream()
+            .map(Player::getUsername)
+            .collect(Collectors.toSet());
+
+        return Mono.just(new PacketOutGameInfo(game.getUid(), game.getStatus(), playerNames));
     }
 
     /**

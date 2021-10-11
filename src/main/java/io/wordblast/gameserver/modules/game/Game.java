@@ -16,6 +16,7 @@ public class Game {
     private GameOptions options;
     private GameStatus status;
     private Set<String> usedWords;
+    private Player currentPlayer;
     // private Socket connection;
 
     public Game() {
@@ -33,6 +34,10 @@ public class Game {
 
     public GameStatus getStatus() {
         return status;
+    }
+
+    public void setStatus(GameStatus status) {
+        this.status = status;
     }
 
     public Set<Player> getPlayers() {
@@ -65,5 +70,13 @@ public class Game {
 
     public GameOptions getGameOptions() {
         return options;
+    }
+
+    public Player getCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    public void setCurrentPlayer(Player currentPlayer) {
+        this.currentPlayer = currentPlayer;
     }
 }

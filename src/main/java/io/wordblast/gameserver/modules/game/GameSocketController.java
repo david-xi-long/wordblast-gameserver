@@ -47,28 +47,36 @@ public class GameSocketController {
 
         Player player = new Player(username);
         player.setConnection(connection);
+        player.setState(true);
 
         game.addPlayer(player);
 
-        // When the player disconnects, set their state to false.
+        // Inform clients that the player is active.
+        PacketOutPlayerState activeStatePacket =
+            new PacketOutPlayerState(player.getUsername(), true);
+
+        SocketUtils.sendPacket(game, "player-state", activeStatePacket);
+
         SocketUtils.handleDisconnect(connection, () -> {
+            // When the player disconnects, set their state to false.
             player.setState(false);
 
-            PacketOutPlayerState statePacket =
+            // Inform clients that the player is inactive.
+            PacketOutPlayerState inactiveStatePacket =
                 new PacketOutPlayerState(player.getUsername(), false);
 
-            // Inform clients about the disconnect.
-            SocketUtils.sendPacket(game, "player-state", statePacket);
+            SocketUtils.sendPacket(game, "player-state", inactiveStatePacket);
         });
 
         // This should be optimized later on, so that the player uids are not calculated
         // every time someone attempts to join the game.
-        Set<String> playerNames = game.getPlayers()
+        Set<String> activePlayerNames = game.getPlayers()
             .stream()
+            .filter((p) -> p.getState())
             .map(Player::getUsername)
             .collect(Collectors.toSet());
 
-        return Mono.just(new PacketOutGameInfo(game.getUid(), game.getStatus(), playerNames));
+        return Mono.just(new PacketOutGameInfo(game.getUid(), game.getStatus(), activePlayerNames));
     }
 
     /**

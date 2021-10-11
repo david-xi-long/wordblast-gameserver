@@ -10,20 +10,20 @@ import java.util.UUID;
 public final class PacketOutGameInfo extends Packet {
     private final UUID gameUid;
     private final GameStatus status;
-    private final Set<String> playerNames;
+    private final Set<String> activePlayerNames;
 
     /**
      * Creates a new PacketOutGameInfo instance.
      * 
      * @param gameUid the unique identifier of the game.
      * @param status the status of the game.
-     * @param playerNames the usernames of the players inside the game.
+     * @param activePlayerNames the usernames of the active players inside the game.
      */
-    public PacketOutGameInfo(UUID gameUid, GameStatus status, Set<String> playerNames) {
+    public PacketOutGameInfo(UUID gameUid, GameStatus status, Set<String> activePlayerNames) {
         super(PacketType.PACKET_OUT_GAME_INFO);
         this.gameUid = gameUid;
         this.status = status;
-        this.playerNames = playerNames;
+        this.activePlayerNames = activePlayerNames;
     }
 
     public UUID getGameUid() {
@@ -34,7 +34,7 @@ public final class PacketOutGameInfo extends Packet {
         return status;
     }
 
-    public Set<String> getPlayerNames() {
-        return playerNames;
+    public Set<String> getActivePlayerNames() {
+        return activePlayerNames;
     }
 }

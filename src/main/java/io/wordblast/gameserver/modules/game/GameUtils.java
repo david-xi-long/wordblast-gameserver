@@ -75,7 +75,7 @@ public final class GameUtils {
      * @return the retrieved or created game.
      */
     public CompletableFuture<Game> createSinglePlayerGame() {
-        CompletableFuture<Game> gameFuture = new CompletableFuture<>();
+        final CompletableFuture<Game> gameFuture = new CompletableFuture<>();
 
         // Create a new game with limit on one player
         Game game = new Game();

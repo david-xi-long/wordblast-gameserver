@@ -13,9 +13,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Game {
     private final UUID uid;
     private final Set<Player> players = new HashSet<>();
+    private Set<Player> alivePlayers = new HashSet<>();
     private GameOptions options;
     private GameStatus status;
     private Set<String> usedWords;
+    private Set<String> usedLetterCombinations;
+    private String currentLetterCombo;
     private Player currentPlayer;
     // private Socket connection;
 
@@ -60,6 +63,14 @@ public class Game {
         usedWords.add(word);
     }
 
+    public Set<String> getLetterCombinations() {
+        return usedLetterCombinations;
+    }
+
+    public void addLetterCombination(String letterCombo) {
+        usedLetterCombinations.add(letterCombo);
+    }
+
     // public Socket getConnection() {
     // return connection;
     // }
@@ -78,5 +89,26 @@ public class Game {
 
     public void setCurrentPlayer(Player currentPlayer) {
         this.currentPlayer = currentPlayer;
+    }
+
+    public Set<Player> getAlivePlayers() {
+        return alivePlayers;
+    }
+
+    public void addAlivePlayer(Player player) {
+        alivePlayers.add(player);
+    }
+
+    public void removeAlivePlayer(Player player) {
+        alivePlayers.remove(player);
+    }
+
+    public void setCurrentLetterCombo(String letterCombo) {
+        System.out.println(letterCombo);
+        this.currentLetterCombo = letterCombo;
+    }
+
+    public String getCurrentLetterCombo() {
+        return this.currentLetterCombo;
     }
 }

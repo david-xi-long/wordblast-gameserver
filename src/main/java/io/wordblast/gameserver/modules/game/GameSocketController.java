@@ -1,11 +1,13 @@
 package io.wordblast.gameserver.modules.game;
 
+import io.wordblast.gameserver.modules.game.packets.PacketInCheckWord;
 import io.wordblast.gameserver.modules.game.packets.PacketInGameJoin;
 import io.wordblast.gameserver.modules.game.packets.PacketInSelectUsername;
 import io.wordblast.gameserver.modules.game.packets.PacketOutException;
 import io.wordblast.gameserver.modules.game.packets.PacketOutGameInfo;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerState;
 import io.wordblast.gameserver.modules.game.packets.PacketOutSelectUsername;
+import io.wordblast.gameserver.modules.game.packets.PacketOutCheckWord;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -112,5 +114,20 @@ public class GameSocketController {
     @MessageExceptionHandler
     public Mono<PacketOutException> handleException(Exception exception) {
         return Mono.just(new PacketOutException(exception.getMessage()));
+    }
+
+    /**
+     * Handles players sending a word as an input to be checked.
+     * 
+     * @param packet the packet to handle.
+     * @return the packet response.
+     */
+    @MessageMapping("check-word")
+    public Mono<PacketOutCheckWord> checkWord(PacketInCheckWord packet) {
+        UUID gameUid = packet.getGameUid();
+        String word = packet.getWord();
+        Game game = GameManager.getGame(gameUid);
+        GameService service = new GameService(game);
+        return Mono.just(new PacketOutCheckWord(service.checkWord(word)));
     }
 }

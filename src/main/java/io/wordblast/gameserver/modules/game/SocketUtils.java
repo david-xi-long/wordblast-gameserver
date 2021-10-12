@@ -18,8 +18,8 @@ public final class SocketUtils {
     /**
      * Sets a handler for when the socket client disconnects.
      * 
-     * @param connection the connect to add the handler to.
-     * @param runnable what to run when the client disconnects.
+     * @param connection the connection to add the handler to.
+     * @param runnable the callback to invoke when the client disconnects.
      */
     public static void handleDisconnect(RSocketRequester connection, Runnable runnable) {
         connection.rsocket()
@@ -32,7 +32,7 @@ public final class SocketUtils {
      * Sends a packet to all the players within a game.
      * 
      * @param game the game to send the packet to.
-     * @param route the route to send the packet to.
+     * @param route the route to send the data to.
      * @param packet the packet to send.
      */
     public static void sendPacket(Game game, String route, Packet packet) {
@@ -48,15 +48,24 @@ public final class SocketUtils {
      * Sends data to all the connections within a stream.
      * 
      * @param connections the connections to send the data to.
-     * @param route the route to send the packet to.
+     * @param route the route to send the data to.
      * @param data the data to send.
      */
     public static void sendData(Stream<RSocketRequester> connections, String route, Object data) {
-        connections.forEach((c) -> {
-            c.route(route)
-                .data(data)
-                .send()
-                .subscribe();
-        });
+        connections.forEach((c) -> sendData(c, route, data));
+    }
+
+    /**
+     * Sends data to the connection.
+     * 
+     * @param connection the connection to send the data to.
+     * @param route the route to send the data to.
+     * @param data the data to send.
+     */
+    public static void sendData(RSocketRequester connection, String route, Object data) {
+        connection.route(route)
+            .data(data)
+            .send()
+            .subscribe();
     }
 }

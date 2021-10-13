@@ -2,17 +2,20 @@ package io.wordblast.gameserver.modules.game;
 
 import io.wordblast.gameserver.modules.game.packets.PacketInCheckWord;
 import io.wordblast.gameserver.modules.game.packets.PacketInGameJoin;
+import io.wordblast.gameserver.modules.game.packets.PacketInPlayerMessage;
 import io.wordblast.gameserver.modules.game.packets.PacketInSelectUsername;
 import io.wordblast.gameserver.modules.game.packets.PacketOutException;
 import io.wordblast.gameserver.modules.game.packets.PacketOutGameInfo;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerState;
 import io.wordblast.gameserver.modules.game.packets.PacketOutSelectUsername;
 import io.wordblast.gameserver.modules.game.packets.PacketOutCheckWord;
+import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerMessage;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.rsocket.RSocketRequester;
 import org.springframework.stereotype.Controller;
 import reactor.core.publisher.Mono;
@@ -79,6 +82,20 @@ public class GameSocketController {
             .collect(Collectors.toSet());
 
         return Mono.just(new PacketOutGameInfo(game.getUid(), game.getStatus(), activePlayerNames));
+    }
+
+    /**
+     * Handles players sending chat messages in game.
+     * 
+     * @param packet the packet to handle.
+     * @return the packet response.
+     */
+    @MessageMapping("chat-message")
+    public Mono<Void> fireAndForget(@Payload PacketInPlayerMessage packet) {
+        PacketOutPlayerMessage message = new PacketOutPlayerMessage(packet.getGameUid(), packet.getUsername(), packet.getMessage());
+        Game game = GameManager.getGame(packet.getGameUid());
+        SocketUtils.sendPacket(game, "chat-message", message);
+        return Mono.empty();
     }
 
     /**

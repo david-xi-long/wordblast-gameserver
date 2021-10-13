@@ -177,11 +177,15 @@ public class GameSocketController {
         }
 
         // TODO: Get player of the request, and change username.
-        // TODO: Echo the packet to all other players in the game.
-
-        String oldUsername = packet.getOldUsername();
 
         // Validation checks passed, echo the packet.
-        return Mono.just(new PacketOutUsernameChange(gameUid, oldUsername, newUsername));
+        String oldUsername = packet.getOldUsername();
+
+        PacketOutUsernameChange echoPacket =
+            new PacketOutUsernameChange(gameUid, oldUsername, newUsername);
+
+        SocketUtils.sendPacket(game, "change-username", echoPacket);
+
+        return Mono.just(echoPacket);
     }
 }

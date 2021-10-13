@@ -1,9 +1,5 @@
 package io.wordblast.gameserver.modules.game;
 
-import org.springframework.stereotype.Service;
-
-import java.util.UUID;
-
 /**
  * Various methods to help run game logic.
  */
@@ -15,37 +11,38 @@ public class GameService {
     }
 
     public String generateLetterCombination() {
-
         return "";
     }
 
+    /**
+     * Check if the word has already been used in the game.
+     * 
+     * @param word the word to check.
+     * @return {@code true} if the word has been used, otherwise {@code false}.
+     */
     public boolean checkWord(String word) {
-        // Check list of used Words
+        // TODO: Check list of used Words.
+        // TODO: Check if word contains current letter combination.
+        // TODO: Check other constraints.
+        // TODO: Calculate value of word.
 
-        // Check if word contains current letter combination
-
-        // Check other constraints
-
-        // Calculate value of word
         return true;
     }
 
-    public Game startGame(Game game) {
+    /**
+     * Starts the game.
+     * 
+     * @param game the game to start.
+     */
+    public void startGame(Game game) {
         game.setStatus(GameStatus.STARTED);
-
-        return game;
     }
 
     public Game gameplay(Game game) {
-        
         return game;
     }
 
     public Game endGame(Game game) {
-
         return game;
     }
-    
-
-
 }

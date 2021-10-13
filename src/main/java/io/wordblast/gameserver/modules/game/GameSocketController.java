@@ -4,12 +4,14 @@ import io.wordblast.gameserver.modules.game.packets.PacketInCheckWord;
 import io.wordblast.gameserver.modules.game.packets.PacketInGameJoin;
 import io.wordblast.gameserver.modules.game.packets.PacketInPlayerMessage;
 import io.wordblast.gameserver.modules.game.packets.PacketInSelectUsername;
+import io.wordblast.gameserver.modules.game.packets.PacketInUsernameChange;
+import io.wordblast.gameserver.modules.game.packets.PacketOutCheckWord;
 import io.wordblast.gameserver.modules.game.packets.PacketOutException;
 import io.wordblast.gameserver.modules.game.packets.PacketOutGameInfo;
+import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerMessage;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerState;
 import io.wordblast.gameserver.modules.game.packets.PacketOutSelectUsername;
-import io.wordblast.gameserver.modules.game.packets.PacketOutCheckWord;
-import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerMessage;
+import io.wordblast.gameserver.modules.game.packets.PacketOutUsernameChange;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -92,14 +94,15 @@ public class GameSocketController {
      */
     @MessageMapping("chat-message")
     public Mono<Void> fireAndForget(@Payload PacketInPlayerMessage packet) {
-        PacketOutPlayerMessage message = new PacketOutPlayerMessage(packet.getGameUid(), packet.getUsername(), packet.getMessage());
+        PacketOutPlayerMessage message = new PacketOutPlayerMessage(packet.getGameUid(),
+            packet.getUsername(), packet.getMessage());
         Game game = GameManager.getGame(packet.getGameUid());
         SocketUtils.sendPacket(game, "chat-message", message);
         return Mono.empty();
     }
 
     /**
-     * Handles players select their username within a game.
+     * Handles players selecting their username within a game.
      * 
      * @param packet the packet to handle.
      * @return the packet response.
@@ -146,5 +149,39 @@ public class GameSocketController {
         Game game = GameManager.getGame(gameUid);
         GameService service = new GameService(game);
         return Mono.just(new PacketOutCheckWord(service.checkWord(word)));
+    }
+
+    /**
+     * Handles players changing their usernames in a game.
+     * 
+     * @param packet the packet to handle.
+     * @return the packet response.
+     */
+    @MessageMapping("change-username")
+    public Mono<PacketOutUsernameChange> changeUsername(PacketInUsernameChange packet) {
+        UUID gameUid = packet.getGameUid();
+        String newUsername = packet.getNewUsername();
+
+        Game game = GameManager.getGame(gameUid);
+
+        if (game == null) {
+            return Mono.error(new GameNotFoundException());
+        }
+
+        boolean usernameExists = game.getPlayers()
+            .stream()
+            .anyMatch((p) -> p.getUsername().equalsIgnoreCase(newUsername));
+
+        if (usernameExists) {
+            return Mono.error(new UsernameTakenException());
+        }
+
+        // TODO: Get player of the request, and change username.
+        // TODO: Echo the packet to all other players in the game.
+
+        String oldUsername = packet.getOldUsername();
+
+        // Validation checks passed, echo the packet.
+        return Mono.just(new PacketOutUsernameChange(gameUid, oldUsername, newUsername));
     }
 }

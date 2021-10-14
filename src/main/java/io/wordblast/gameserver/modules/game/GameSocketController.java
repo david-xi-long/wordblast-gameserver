@@ -3,15 +3,15 @@ package io.wordblast.gameserver.modules.game;
 import io.wordblast.gameserver.modules.game.packets.PacketInCheckWord;
 import io.wordblast.gameserver.modules.game.packets.PacketInGameJoin;
 import io.wordblast.gameserver.modules.game.packets.PacketInPlayerMessage;
-import io.wordblast.gameserver.modules.game.packets.PacketInSelectUsername;
 import io.wordblast.gameserver.modules.game.packets.PacketInUsernameChange;
+import io.wordblast.gameserver.modules.game.packets.PacketInUsernameSelect;
 import io.wordblast.gameserver.modules.game.packets.PacketOutCheckWord;
 import io.wordblast.gameserver.modules.game.packets.PacketOutException;
 import io.wordblast.gameserver.modules.game.packets.PacketOutGameInfo;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerMessage;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerState;
-import io.wordblast.gameserver.modules.game.packets.PacketOutSelectUsername;
 import io.wordblast.gameserver.modules.game.packets.PacketOutUsernameChange;
+import io.wordblast.gameserver.modules.game.packets.PacketOutUsernameSelect;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -108,7 +108,7 @@ public class GameSocketController {
      * @return the packet response.
      */
     @MessageMapping("select-username")
-    public Mono<PacketOutSelectUsername> selectUsername(PacketInSelectUsername packet) {
+    public Mono<PacketOutUsernameSelect> selectUsername(PacketInUsernameSelect packet) {
         UUID gameUid = packet.getGameUid();
         String username = packet.getUsername();
 
@@ -122,7 +122,7 @@ public class GameSocketController {
             .stream()
             .anyMatch((p) -> p.getUsername().equalsIgnoreCase(username));
 
-        return Mono.just(new PacketOutSelectUsername(usernameExists));
+        return Mono.just(new PacketOutUsernameSelect(usernameExists));
     }
 
     /**

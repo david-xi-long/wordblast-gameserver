@@ -3,6 +3,7 @@ package io.wordblast.gameserver.modules.game;
 import io.wordblast.gameserver.modules.game.packets.PacketInCheckWord;
 import io.wordblast.gameserver.modules.game.packets.PacketInGameJoin;
 import io.wordblast.gameserver.modules.game.packets.PacketInPlayerMessage;
+import io.wordblast.gameserver.modules.game.packets.PacketInStartGame;
 import io.wordblast.gameserver.modules.game.packets.PacketInUsernameChange;
 import io.wordblast.gameserver.modules.game.packets.PacketInUsernameSelect;
 import io.wordblast.gameserver.modules.game.packets.PacketOutCheckWord;
@@ -10,6 +11,7 @@ import io.wordblast.gameserver.modules.game.packets.PacketOutException;
 import io.wordblast.gameserver.modules.game.packets.PacketOutGameInfo;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerMessage;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerState;
+import io.wordblast.gameserver.modules.game.packets.PacketOutStartGame;
 import io.wordblast.gameserver.modules.game.packets.PacketOutUsernameChange;
 import io.wordblast.gameserver.modules.game.packets.PacketOutUsernameSelect;
 import java.util.Set;
@@ -188,4 +190,21 @@ public class GameSocketController {
 
         return Mono.just(echoPacket);
     }
+
+    /**
+     * Handles the start game request.
+     * 
+     * @param packet the packet to handle.
+     * @return the packet response.
+     */
+    @MessageMapping("start-game")
+    public Mono<Void> startGame(@Payload PacketInStartGame packet) {
+        // TODO: this is definitely not the right implementation, I need to fix it later
+        UUID gameUid = packet.getGameUid();
+        Game game = GameManager.getGame(gameUid);
+        PacketOutStartGame outPacket = new PacketOutStartGame(gameUid, packet.getPlayers());
+        SocketUtils.sendPacket(game, "start-game", outPacket);
+        return Mono.empty();
+    }
+
 }

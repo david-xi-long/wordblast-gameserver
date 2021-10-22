@@ -1,5 +1,6 @@
 package io.wordblast.gameserver.modules.game;
 
+import java.util.ArrayList;
 // import java.net.Socket;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,7 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "games")
 public class Game {
     private final UUID uid;
-    private final Set<Player> players = new HashSet<>();
+    private final ArrayList<Player> players = new ArrayList<>();
     private Set<Player> alivePlayers = new HashSet<>();
     private GameOptions options;
     private GameStatus status;
@@ -43,7 +44,7 @@ public class Game {
         this.status = status;
     }
 
-    public Set<Player> getPlayers() {
+    public ArrayList<Player> getPlayers() {
         return players;
     }
 

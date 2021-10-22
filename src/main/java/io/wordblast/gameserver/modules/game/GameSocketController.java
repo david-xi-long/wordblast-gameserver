@@ -45,6 +45,10 @@ public class GameSocketController {
         if (game == null) {
             return Mono.error(new GameNotFoundException());
         }
+        
+        if (game.getStatus() == GameStatus.STARTED) {
+            return Mono.error(new GameInProgressException());
+        }
 
         boolean usernameExists = game.getPlayers()
             .stream()
@@ -199,10 +203,14 @@ public class GameSocketController {
      */
     @MessageMapping("start-game")
     public Mono<Void> startGame(@Payload PacketInStartGame packet) {
-        // TODO: this is definitely not the right implementation, I need to fix it later
         UUID gameUid = packet.getGameUid();
         Game game = GameManager.getGame(gameUid);
-        PacketOutStartGame outPacket = new PacketOutStartGame(gameUid, packet.getPlayers());
+        String players[] = new String[game.getPlayers().size()];
+        for (int i = 0; i < players.length; i++) {
+            players[i] = game.getPlayers().get(i).getUsername();
+        }
+        game.setStatus(GameStatus.STARTED);
+        PacketOutStartGame outPacket = new PacketOutStartGame(gameUid, players);
         SocketUtils.sendPacket(game, "start-game", outPacket);
         return Mono.empty();
     }

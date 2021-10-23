@@ -2,6 +2,7 @@ package io.wordblast.gameserver.modules.game;
 
 import io.wordblast.gameserver.modules.game.packets.PacketInCheckWord;
 import io.wordblast.gameserver.modules.game.packets.PacketInGameJoin;
+import io.wordblast.gameserver.modules.game.packets.PacketInNextTurn;
 import io.wordblast.gameserver.modules.game.packets.PacketInPlayerMessage;
 import io.wordblast.gameserver.modules.game.packets.PacketInStartGame;
 import io.wordblast.gameserver.modules.game.packets.PacketInUsernameChange;
@@ -9,6 +10,7 @@ import io.wordblast.gameserver.modules.game.packets.PacketInUsernameSelect;
 import io.wordblast.gameserver.modules.game.packets.PacketOutCheckWord;
 import io.wordblast.gameserver.modules.game.packets.PacketOutException;
 import io.wordblast.gameserver.modules.game.packets.PacketOutGameInfo;
+import io.wordblast.gameserver.modules.game.packets.PacketOutNextTurn;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerMessage;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerState;
 import io.wordblast.gameserver.modules.game.packets.PacketOutStartGame;
@@ -212,6 +214,20 @@ public class GameSocketController {
         game.setStatus(GameStatus.STARTED);
         PacketOutStartGame outPacket = new PacketOutStartGame(gameUid, players);
         SocketUtils.sendPacket(game, "start-game", outPacket);
+        return Mono.empty();
+    }
+
+    /**
+     * Handles the next turn request.
+     * @param packet the packet to handle.
+     * @return the packet response.
+     */
+    @MessageMapping("next-turn")
+    public Mono<Void> nextTurn(@Payload PacketInNextTurn packet) {
+        UUID gameUid = packet.getGameUid();
+        Game game = GameManager.getGame(gameUid);
+        PacketOutNextTurn outPacket = new PacketOutNextTurn("test", 180);
+        SocketUtils.sendPacket(game, "next-turn", outPacket);
         return Mono.empty();
     }
 

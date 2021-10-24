@@ -3,8 +3,8 @@ package io.wordblast.gameserver.modules.game.packets;
 import java.util.UUID;
 
 /**
- * Packet representing a single character that a player may type
- * as they try to submit a valid word while in-game
+ * Packet representing a single character that a player may type as they try to submit a valid word
+ * while in-game.
  */
 public class PacketInCharacter extends Packet {
     private final UUID gameUid;
@@ -12,11 +12,11 @@ public class PacketInCharacter extends Packet {
     private final char character;
 
     /**
-     * Creates a new PacketInCharacter
+     * Creates a new PacketInCharacter.
      * 
      * @param gameUid the unique identifier of the game.
-     * @param username the username of the player inputting the character
-     * @param message the character the player sent in through the game
+     * @param username the username of the player inputting the character.
+     * @param character the character the player sent in through the game.
      */
     public PacketInCharacter(UUID gameUid, String username, char character) {
         super(PacketType.PACKET_IN_CHARACTER);

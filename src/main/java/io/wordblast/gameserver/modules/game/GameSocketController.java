@@ -45,7 +45,7 @@ public class GameSocketController {
         if (game == null) {
             return Mono.error(new GameNotFoundException());
         }
-        
+
         if (game.getStatus() == GameStatus.STARTED) {
             return Mono.error(new GameInProgressException());
         }
@@ -205,7 +205,7 @@ public class GameSocketController {
     public Mono<Void> startGame(@Payload PacketInStartGame packet) {
         UUID gameUid = packet.getGameUid();
         Game game = GameManager.getGame(gameUid);
-        String players[] = new String[game.getPlayers().size()];
+        String[] players = new String[game.getPlayers().size()];
         for (int i = 0; i < players.length; i++) {
             players[i] = game.getPlayers().get(i).getUsername();
         }

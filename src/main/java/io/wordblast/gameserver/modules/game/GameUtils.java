@@ -79,9 +79,9 @@ public final class GameUtils {
 
         // Create a new game with limit on one player
         Game game = new Game();
-        GameOptions options = new GameOptions();
-        options.setMaxPlayers(1);
-        game.setGameOptions(options);
+
+        game.getGameOptions().setMaxPlayers(1);
+
         GameManager.registerGame(game);
 
         // Duplicate game variable and assign it the final modifier, so the value does not
@@ -92,7 +92,4 @@ public final class GameUtils {
         gameDao.createGame(game).thenRun(() -> gameFuture.complete(gameFinal));
         return gameFuture;
     }
-
-
-
 }

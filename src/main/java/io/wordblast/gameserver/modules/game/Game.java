@@ -1,7 +1,6 @@
 package io.wordblast.gameserver.modules.game;
 
 import java.util.ArrayList;
-// import java.net.Socket;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -14,14 +13,13 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Game {
     private final UUID uid;
     private final ArrayList<Player> players = new ArrayList<>();
-    private Set<Player> alivePlayers = new HashSet<>();
-    private GameOptions options;
+    private final Set<Player> alivePlayers = new HashSet<>();
+    private GameOptions options = new GameOptions();
     private GameStatus status;
     private Set<String> usedWords;
     private Set<String> usedLetterCombinations;
     private String currentLetterCombo;
     private Player currentPlayer;
-    // private Socket connection;
 
     public Game() {
         this(UUID.randomUUID());
@@ -72,10 +70,6 @@ public class Game {
         usedLetterCombinations.add(letterCombo);
     }
 
-    // public Socket getConnection() {
-    // return connection;
-    // }
-
     public void setGameOptions(GameOptions options) {
         this.options = options;
     }
@@ -105,7 +99,6 @@ public class Game {
     }
 
     public void setCurrentLetterCombo(String letterCombo) {
-        System.out.println(letterCombo);
         this.currentLetterCombo = letterCombo;
     }
 

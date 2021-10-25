@@ -6,23 +6,23 @@ import java.util.UUID;
  * Packet representing a single character that a player may type as they try to submit a valid word
  * while in-game.
  */
-public class PacketInCharacter extends Packet {
+public class PacketInGameWord extends Packet {
     private final UUID gameUid;
     private final String username;
-    private final char character;
+    private final String word;
 
     /**
      * Creates a new PacketInCharacter.
      * 
      * @param gameUid the unique identifier of the game.
      * @param username the username of the player inputting the character.
-     * @param character the character the player sent in through the game.
+     * @param word the character the player sent in through the game.
      */
-    public PacketInCharacter(UUID gameUid, String username, char character) {
-        super(PacketType.PACKET_IN_CHARACTER);
+    public PacketInGameWord(UUID gameUid, String username, String word) {
+        super(PacketType.PACKET_IN_GAME_WORD);
         this.gameUid = gameUid;
         this.username = username;
-        this.character = character;
+        this.word = word;
     }
 
     public UUID getGameUid() {
@@ -33,7 +33,7 @@ public class PacketInCharacter extends Packet {
         return username;
     }
 
-    public char getCharacter() {
-        return character;
+    public char getWord() {
+        return word;
     }
 }

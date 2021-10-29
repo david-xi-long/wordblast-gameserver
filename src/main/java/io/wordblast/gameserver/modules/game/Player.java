@@ -10,6 +10,7 @@ public class Player {
     private final UUID uid = UUID.randomUUID();
 
     private String username;
+    private boolean ready;
     private boolean state;
     private int lives;
     private int score;
@@ -30,6 +31,14 @@ public class Player {
 
     public void setUsername(String name) {
         this.username = name;
+    }
+
+    public boolean isReady() {
+        return ready;
+    }
+
+    public void setReady(boolean ready) {
+        this.ready = ready;
     }
 
     public boolean getState() {

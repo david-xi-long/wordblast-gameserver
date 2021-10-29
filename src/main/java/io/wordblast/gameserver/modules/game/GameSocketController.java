@@ -4,6 +4,7 @@ import io.wordblast.gameserver.modules.game.packets.PacketInCheckWord;
 import io.wordblast.gameserver.modules.game.packets.PacketInGameJoin;
 import io.wordblast.gameserver.modules.game.packets.PacketInNextTurn;
 import io.wordblast.gameserver.modules.game.packets.PacketInPlayerMessage;
+import io.wordblast.gameserver.modules.game.packets.PacketInPlayerReadyState;
 import io.wordblast.gameserver.modules.game.packets.PacketInStartGame;
 import io.wordblast.gameserver.modules.game.packets.PacketInUsernameChange;
 import io.wordblast.gameserver.modules.game.packets.PacketInUsernameSelect;
@@ -12,6 +13,7 @@ import io.wordblast.gameserver.modules.game.packets.PacketOutException;
 import io.wordblast.gameserver.modules.game.packets.PacketOutGameInfo;
 import io.wordblast.gameserver.modules.game.packets.PacketOutNextTurn;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerMessage;
+import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerReadyState;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerState;
 import io.wordblast.gameserver.modules.game.packets.PacketOutStartGame;
 import io.wordblast.gameserver.modules.game.packets.PacketOutUsernameChange;
@@ -83,15 +85,14 @@ public class GameSocketController {
             SocketUtils.sendPacket(game, "player-state", inactiveStatePacket);
         });
 
-        // This should be optimized later on, so that the player uids are not calculated
-        // every time someone attempts to join the game.
-        Set<String> activePlayerNames = game.getPlayers()
+        // TODO: This should not be calculated every single time a player joins.
+        Set<PlayerInfo> activePlayerInfos = game.getPlayers()
             .stream()
             .filter((p) -> p.getState())
-            .map(Player::getUsername)
+            .map((p) -> new PlayerInfo(p.getUsername(), p.isReady()))
             .collect(Collectors.toSet());
 
-        return Mono.just(new PacketOutGameInfo(game.getUid(), game.getStatus(), activePlayerNames));
+        return Mono.just(new PacketOutGameInfo(game.getUid(), game.getStatus(), activePlayerInfos));
     }
 
     /**
@@ -219,6 +220,7 @@ public class GameSocketController {
 
     /**
      * Handles the next turn request.
+     * 
      * @param packet the packet to handle.
      * @return the packet response.
      */
@@ -231,4 +233,39 @@ public class GameSocketController {
         return Mono.empty();
     }
 
+    /**
+     * Handles when a player changes their ready state.
+     * 
+     * @param packet the packet to handle.
+     * @return the packet response.
+     */
+    @MessageMapping("player-ready-state")
+    public Mono<Void> playerReady(PacketInPlayerReadyState packet) {
+        UUID gameUid = packet.getGameUid();
+
+        Game game = GameManager.getGame(gameUid);
+
+        if (game == null) {
+            return Mono.error(new GameNotFoundException());
+        }
+
+        String username = packet.getUsername();
+
+        Player player = game.getPlayers()
+            .stream()
+            .filter((p) -> p.getUsername().equals(username))
+            .findFirst()
+            .orElse(null);
+
+        if (player == null) {
+            return Mono.error(new PlayerNotFoundException());
+        }
+
+        player.setReady(packet.isReady());
+
+        SocketUtils.sendPacket(game, "player-ready-state",
+            new PacketOutPlayerReadyState(gameUid, username, packet.isReady()));
+
+        return Mono.empty();
+    }
 }

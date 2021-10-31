@@ -13,6 +13,7 @@ public class User {
     @Id
     private String email;
     private String hashedPassword;
+    private int experience;
 
     /**
      * Creates a new user object with the default values.
@@ -32,6 +33,7 @@ public class User {
         this.uid = uid;
         this.email = email;
         this.hashedPassword = hashedPassword;
+        this.experience = 0;
     }
 
     public void setUid(UUID uuid) {
@@ -56,5 +58,13 @@ public class User {
 
     public String getHashedPassword() {
         return hashedPassword;
+    }
+
+    public int getExperience() {
+        return experience;
+    }
+
+    public void addExperience(int xp) {
+        this.experience += xp;
     }
 }

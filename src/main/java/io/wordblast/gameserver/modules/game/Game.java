@@ -1,9 +1,12 @@
 package io.wordblast.gameserver.modules.game;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -11,15 +14,23 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Document(collection = "games")
 public class Game {
+    @JsonIgnore
+    @Transient
+    private final GameController controller = new GameController(this);
+
     private final UUID uid;
-    private final ArrayList<Player> players = new ArrayList<>();
+    private final List<Player> players = new ArrayList<>();
     private final Set<Player> alivePlayers = new HashSet<>();
+
     private GameOptions options = new GameOptions();
     private GameStatus status;
     private Set<String> usedWords;
     private Set<String> usedLetterCombinations;
     private String currentLetterCombo;
     private Player currentPlayer;
+    private int currentRound;
+    private Countdown countdown;
+    private UUID ownerUid;
 
     public Game() {
         this(UUID.randomUUID());
@@ -28,6 +39,10 @@ public class Game {
     public Game(final UUID uid) {
         this.uid = uid;
         this.status = GameStatus.WAITING;
+    }
+
+    public GameController getController() {
+        return controller;
     }
 
     public UUID getUid() {
@@ -42,7 +57,7 @@ public class Game {
         this.status = status;
     }
 
-    public ArrayList<Player> getPlayers() {
+    public List<Player> getPlayers() {
         return players;
     }
 
@@ -104,5 +119,29 @@ public class Game {
 
     public String getCurrentLetterCombo() {
         return this.currentLetterCombo;
+    }
+
+    public int getCurrentRound() {
+        return currentRound;
+    }
+
+    public void setCurrentRound(int currentRound) {
+        this.currentRound = currentRound;
+    }
+
+    public Countdown getCountdown() {
+        return countdown;
+    }
+
+    public void setCountdown(Countdown countdown) {
+        this.countdown = countdown;
+    }
+
+    public UUID getOwner() {
+        return ownerUid;
+    }
+
+    public void setOwner(UUID ownerUid) {
+        this.ownerUid = ownerUid;
     }
 }

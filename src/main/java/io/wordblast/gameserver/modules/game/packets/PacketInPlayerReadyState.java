@@ -5,7 +5,7 @@ import java.util.UUID;
 /**
  * A packet sent to the game server when a player has readied up.
  */
-public class PacketInPlayerReadyState extends Packet {
+public class PacketInPlayerReadyState extends Packet implements GamePacket, PlayerPacket {
     private final UUID gameUid;
     private final String username;
     private final boolean ready;

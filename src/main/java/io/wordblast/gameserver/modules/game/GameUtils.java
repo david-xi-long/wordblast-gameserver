@@ -1,6 +1,7 @@
 package io.wordblast.gameserver.modules.game;
 
 import io.wordblast.gameserver.modules.database.GameDao;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -67,6 +68,22 @@ public final class GameUtils {
      */
     public Game createDefaultGame() {
         return new Game();
+    }
+
+    /**
+     * Creates a new private game.
+     * 
+     * @param ownerUid the unique identifier of the owner user of the gmae.
+     * @return the created game.
+     */
+    public CompletableFuture<Game> createPrivateGame(UUID ownerUid) {
+        Game game = createDefaultGame();
+
+        game.setOwner(ownerUid);
+
+        GameManager.registerGame(game);
+
+        return gameDao.createGame(game);
     }
 
     /**

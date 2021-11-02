@@ -1,12 +1,17 @@
 package io.wordblast.gameserver.modules.game;
 
+import io.wordblast.gameserver.modules.authentication.NotAuthorizedException;
+import io.wordblast.gameserver.modules.authentication.UserDetailsImpl;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -25,6 +30,21 @@ public class GameRestController {
     @GetMapping("/api/game/available")
     public CompletableFuture<Game> getAvailableGame() {
         return gameUtils.getAvailableGameOrCreate();
+    }
+
+    /**
+     * Attempts to create a new private game.
+     * 
+     * @param user the owner of the new game.
+     * @return the game, if created.
+     */
+    @PostMapping("/api/game")
+    public CompletableFuture<Game> createGame(@AuthenticationPrincipal UserDetailsImpl user) {
+        if (user == null) {
+            return CompletableFuture.failedFuture(new NotAuthorizedException());
+        }
+
+        return gameUtils.createPrivateGame(user.getUid());
     }
 
     /**
@@ -49,5 +69,27 @@ public class GameRestController {
         return new ResponseEntity<>(game, game != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
-    
+    /**
+     * Handles exceptions thrown inside request handlers.
+     * 
+     * @param ex the exception to handle.
+     * @return the result of the handled exception.
+     */
+    @ExceptionHandler
+    public ResponseEntity<String> handleExceptions(Exception ex) {
+        HttpStatus status;
+        String exMessage;
+
+        if (ex instanceof NotAuthorizedException) {
+            status = HttpStatus.UNAUTHORIZED;
+            exMessage = ex.getMessage();
+        } else {
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+            exMessage = ex.getMessage();
+        }
+
+        String errMessage = String.format("{\"error\": \"%s\"}", exMessage);
+
+        return new ResponseEntity<>(errMessage, status);
+    }
 }

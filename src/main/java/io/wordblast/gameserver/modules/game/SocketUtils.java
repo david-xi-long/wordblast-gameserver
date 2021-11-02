@@ -45,6 +45,17 @@ public final class SocketUtils {
     }
 
     /**
+     * Sends a packet to the player.
+     * 
+     * @param player the player to send the packet to.
+     * @param route the route to send the data to.
+     * @param packet the packet to send.
+     */
+    public static void sendPacket(Player player, String route, Packet packet) {
+        sendData(player.getConnection(), route, packet);
+    }
+
+    /**
      * Sends data to all the connections within a stream.
      * 
      * @param connections the connections to send the data to.

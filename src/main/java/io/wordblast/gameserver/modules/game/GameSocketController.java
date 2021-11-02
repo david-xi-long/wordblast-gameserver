@@ -18,6 +18,7 @@ import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerState;
 import io.wordblast.gameserver.modules.game.packets.PacketOutStartGame;
 import io.wordblast.gameserver.modules.game.packets.PacketOutUsernameChange;
 import io.wordblast.gameserver.modules.game.packets.PacketOutUsernameSelect;
+import io.wordblast.gameserver.modules.game.packets.PacketUtils;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -236,20 +237,28 @@ public class GameSocketController {
     /**
      * Handles when a player changes their ready state.
      * 
-     * @param packet the packet to handle.
+     * @param statePacket the packet to handle.
      * @return the packet response.
      */
     @MessageMapping("player-ready-state")
-    public Mono<Void> playerReady(PacketInPlayerReadyState packet) {
-        UUID gameUid = packet.getGameUid();
+    public Mono<Void> playerReady(PacketInPlayerReadyState statePacket) {
+        Exception err;
 
-        Game game = GameManager.getGame(gameUid);
-
-        if (game == null) {
-            return Mono.error(new GameNotFoundException());
+        // Validate that the game exists.
+        err = PacketUtils.validateGame(statePacket);
+        if (err != null) {
+            return Mono.error(err);
         }
 
-        String username = packet.getUsername();
+        // Validate that the player exists.
+        err = PacketUtils.validatePlayer(statePacket);
+        if (err != null) {
+            return Mono.error(err);
+        }
+
+        UUID gameUid = statePacket.getGameUid();
+        Game game = GameManager.getGame(gameUid);
+        String username = statePacket.getUsername();
 
         Player player = game.getPlayers()
             .stream()
@@ -257,14 +266,16 @@ public class GameSocketController {
             .findFirst()
             .orElse(null);
 
-        if (player == null) {
-            return Mono.error(new PlayerNotFoundException());
-        }
+        // Set the ready state of the player.
+        player.setReady(statePacket.isReady());
 
-        player.setReady(packet.isReady());
-
+        // Echo the packet to all connected players.
         SocketUtils.sendPacket(game, "player-ready-state",
-            new PacketOutPlayerReadyState(gameUid, username, packet.isReady()));
+            new PacketOutPlayerReadyState(gameUid, username, statePacket.isReady()));
+
+        // Start the game if all players are ready.
+        game.getController()
+            .startGameIfReady();
 
         return Mono.empty();
     }

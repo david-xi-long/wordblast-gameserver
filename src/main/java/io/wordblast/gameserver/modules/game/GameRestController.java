@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 /**
  * The game REST endpoints.
@@ -68,6 +69,23 @@ public class GameRestController {
     public ResponseEntity<Game> getGame(@PathVariable UUID gameUid) {
         Game game = GameManager.getGame(gameUid);
         return new ResponseEntity<>(game, game != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    }
+
+    /**
+     * This endpoint will return the number of players which are currently inside a game.
+     * 
+     * @return the count of players.
+     */
+    @GetMapping("/api/game/count")
+    public Mono<String> getPlayingCount() {
+        return Mono.just(
+            String.format("{\"count\": %d}",
+                GameManager.getGames()
+                    .stream()
+                    .flatMap((g) -> g.getPlayers()
+                        .stream()
+                        .filter((p) -> p.getState()))
+                    .count()));
     }
 
     /**

@@ -130,6 +130,21 @@ public class GameSocketController {
     }
 
     /**
+     * Handles players typing a word while on their turn
+     * 
+     * @param packet the packet to handle.
+     * @return the packet response.
+     */
+    @MessageMapping("update-word")
+    public Mono<Void> fireAndForget2(@Payload PacketInPlayerMessage packet) {
+        PacketOutPlayerMessage message = new PacketOutPlayerMessage(packet.getGameUid(),
+            packet.getUsername(), packet.getMessage());
+        Game game = GameManager.getGame(packet.getGameUid());
+        SocketUtils.sendPacket(game, "update-word", message);
+        return Mono.empty();
+    }
+
+    /**
      * Handles players selecting their username within a game.
      * 
      * @param packet the packet to handle.

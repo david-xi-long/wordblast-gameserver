@@ -93,6 +93,8 @@ public class GameSocketController {
         GameOptions options = game.getGameOptions();
         Map<String, String> settings = new LinkedHashMap<>();
 
+        settings.put("public",
+            String.valueOf(options.getVisibility() == GameVisibility.PUBLIC ? true : false));
         settings.put("playerLives", String.valueOf(options.getLivesPerPlayer()));
         settings.put("timePerPlayer", String.valueOf(options.getTimePerPlayer()));
         settings.put("extraLives", String.valueOf(options.earnsExtraLives()));
@@ -336,6 +338,10 @@ public class GameSocketController {
 
         // If available, modify the setting.
         switch (setting) {
+            case "public":
+                options.setVisibility(
+                    Boolean.valueOf(value) ? GameVisibility.PUBLIC : GameVisibility.PRIVATE);
+                break;
             case "playerLives":
                 options.setLivesPerPlayer(Integer.valueOf(value));
                 break;

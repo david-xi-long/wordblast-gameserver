@@ -32,8 +32,10 @@ public class GameController {
         }
 
         // Do not start the game if not all players are ready.
+        // Only count the players that are currently in the game.
         boolean allReady = game.getPlayers()
             .stream()
+            .filter((p) -> p.getState())
             .allMatch((p) -> p.isReady());
 
         if (!allReady) {

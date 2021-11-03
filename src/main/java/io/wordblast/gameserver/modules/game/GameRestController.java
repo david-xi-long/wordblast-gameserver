@@ -39,7 +39,8 @@ public class GameRestController {
      * @return the game, if created.
      */
     @PostMapping("/api/game")
-    public CompletableFuture<Game> createGame(@AuthenticationPrincipal UserDetailsImpl user) {
+    public CompletableFuture<Game> createPrivateGame(
+        @AuthenticationPrincipal UserDetailsImpl user) {
         if (user == null) {
             return CompletableFuture.failedFuture(new NotAuthorizedException());
         }

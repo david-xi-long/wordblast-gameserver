@@ -32,7 +32,7 @@ public final class GameUtils {
         if (game != null) {
             gameFuture.complete(game);
         } else if (game == null) {
-            game = createDefaultGame();
+            game = new Game();
 
             GameManager.registerGame(game);
 
@@ -55,19 +55,11 @@ public final class GameUtils {
     public Game getAvailableGame() {
         return GameManager.getGames()
             .stream()
-            .filter((game) -> game.getStatus() == GameStatus.WAITING
-                && game.getPlayers().size() < 8)
+            .filter((game) -> game.getGameOptions().getVisibility() == GameVisibility.PUBLIC
+                && game.getPlayers().size() < 8
+                && game.getStatus() == GameStatus.WAITING)
             .findFirst()
             .orElse(null);
-    }
-
-    /**
-     * Creates a game with the default settings.
-     * 
-     * @return the created game.
-     */
-    public Game createDefaultGame() {
-        return new Game();
     }
 
     /**
@@ -77,9 +69,10 @@ public final class GameUtils {
      * @return the created game.
      */
     public CompletableFuture<Game> createPrivateGame(UUID ownerUid) {
-        Game game = createDefaultGame();
+        Game game = new Game();
 
         game.setOwner(ownerUid);
+        game.getGameOptions().setVisibility(GameVisibility.PRIVATE);
 
         GameManager.registerGame(game);
 

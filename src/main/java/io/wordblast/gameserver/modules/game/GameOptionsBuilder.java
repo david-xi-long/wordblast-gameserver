@@ -5,6 +5,7 @@ package io.wordblast.gameserver.modules.game;
  */
 // CHECKSTYLE.OFF: MissingJavadocMethodCheck
 public final class GameOptionsBuilder {
+    private GameVisibility visibility = GameVisibility.PUBLIC;
     private int maxPlayers = 8;
     private int livesPerPlayer = 3;
     private int timePerRound = 20;
@@ -18,6 +19,18 @@ public final class GameOptionsBuilder {
         }
         this.maxPlayers = maxPlayers;
         return this;
+    }
+
+    public GameOptionsBuilder visibility(final GameVisibility visibility) {
+        if (visibility == null) {
+            return this;
+        }
+        this.visibility = visibility;
+        return this;
+    }
+
+    public GameVisibility getVisibility() {
+        return visibility;
     }
 
     public int getMaxPlayers() {

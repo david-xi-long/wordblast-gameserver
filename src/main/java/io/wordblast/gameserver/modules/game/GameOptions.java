@@ -4,6 +4,7 @@ package io.wordblast.gameserver.modules.game;
  * The settings of the game lobby.
  */
 public class GameOptions {
+    private GameVisibility visibility = GameVisibility.PUBLIC;
     private int maxPlayers;
     private int livesPerPlayer;
     private int timePerPlayer;
@@ -22,12 +23,21 @@ public class GameOptions {
      * Creates a new game options object with values provided from the builder.
      */
     public GameOptions(GameOptionsBuilder builder) {
+        this.visibility = builder.getVisibility();
         this.maxPlayers = builder.getMaxPlayers();
         this.livesPerPlayer = builder.getLivesPerPlayer();
         this.timePerPlayer = builder.getTimePerRound();
         this.decrementTimePerRound = builder.getDecrementTimePerRound();
         this.earnExtraLives = builder.isEarnExtraLives();
         this.increaseDifficulty = builder.isIncreaseDifficulty();
+    }
+
+    public void setVisibility(GameVisibility visibility) {
+        this.visibility = visibility;
+    }
+
+    public GameVisibility getVisibility() {
+        return visibility;
     }
 
     public void setMaxPlayers(int maxPlayers) {

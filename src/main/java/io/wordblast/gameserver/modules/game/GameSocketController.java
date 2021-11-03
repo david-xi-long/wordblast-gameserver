@@ -5,6 +5,7 @@ import io.wordblast.gameserver.modules.game.packets.PacketInGameJoin;
 import io.wordblast.gameserver.modules.game.packets.PacketInNextTurn;
 import io.wordblast.gameserver.modules.game.packets.PacketInPlayerMessage;
 import io.wordblast.gameserver.modules.game.packets.PacketInPlayerReadyState;
+import io.wordblast.gameserver.modules.game.packets.PacketInSettingChange;
 import io.wordblast.gameserver.modules.game.packets.PacketInStartGame;
 import io.wordblast.gameserver.modules.game.packets.PacketInUsernameChange;
 import io.wordblast.gameserver.modules.game.packets.PacketInUsernameSelect;
@@ -15,10 +16,13 @@ import io.wordblast.gameserver.modules.game.packets.PacketOutNextTurn;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerMessage;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerReadyState;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerState;
+import io.wordblast.gameserver.modules.game.packets.PacketOutSettingChange;
 import io.wordblast.gameserver.modules.game.packets.PacketOutStartGame;
 import io.wordblast.gameserver.modules.game.packets.PacketOutUsernameChange;
 import io.wordblast.gameserver.modules.game.packets.PacketOutUsernameSelect;
 import io.wordblast.gameserver.modules.game.packets.PacketUtils;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -86,6 +90,14 @@ public class GameSocketController {
             SocketUtils.sendPacket(game, "player-state", inactiveStatePacket);
         });
 
+        GameOptions options = game.getGameOptions();
+        Map<String, String> settings = new LinkedHashMap<>();
+
+        settings.put("playerLives", String.valueOf(options.getLivesPerPlayer()));
+        settings.put("timePerPlayer", String.valueOf(options.getTimePerPlayer()));
+        settings.put("extraLives", String.valueOf(options.earnsExtraLives()));
+        settings.put("increasingDifficulty", String.valueOf(options.increasesDifficulty()));
+
         // TODO: This should not be calculated every single time a player joins.
         Set<PlayerInfo> activePlayerInfos = game.getPlayers()
             .stream()
@@ -93,7 +105,13 @@ public class GameSocketController {
             .map((p) -> new PlayerInfo(p.getUsername(), p.isReady()))
             .collect(Collectors.toSet());
 
-        return Mono.just(new PacketOutGameInfo(game.getUid(), game.getStatus(), activePlayerInfos));
+        return Mono.just(
+            new PacketOutGameInfo(
+                game.getUid(),
+                game.getStatus(),
+                activePlayerInfos,
+                game.getOwner(),
+                settings));
     }
 
     /**
@@ -276,6 +294,52 @@ public class GameSocketController {
         // Start the game if all players are ready.
         game.getController()
             .startGameIfReady();
+
+        return Mono.empty();
+    }
+
+    /**
+     * Handles when a game owner has changed a setting within a game.
+     * 
+     * @param packet the packet to handle.
+     * @return the packet response.
+     */
+    @MessageMapping("setting-change")
+    public Mono<Void> settingChange(PacketInSettingChange packet) {
+        // Validate the game exists.
+        Exception err = PacketUtils.validateGame(packet);
+        if (err != null) {
+            return Mono.error(new GameNotFoundException());
+        }
+
+        UUID gameUid = packet.getGameUid();
+        String setting = packet.getSetting();
+        String value = packet.getValue();
+
+        Game game = GameManager.getGame(gameUid);
+        GameOptions options = game.getGameOptions();
+
+        // If available, modify the setting.
+        switch (setting) {
+            case "playerLives":
+                options.setLivesPerPlayer(Integer.valueOf(value));
+                break;
+            case "timePerPlayer":
+                options.setTimePerPlayer(Integer.valueOf(value));
+                break;
+            case "extraLives":
+                options.setEarnExtraLives(Boolean.valueOf(value));
+                break;
+            case "increasingDifficulty":
+                options.setIncreaseDifficulty(Boolean.valueOf(value));
+                break;
+            default:
+                return Mono.error(new GameSettingNotFoundException());
+        }
+
+        // Echo the packet to all the game clients.
+        SocketUtils.sendPacket(game, "setting-change",
+            new PacketOutSettingChange(gameUid, setting, value));
 
         return Mono.empty();
     }

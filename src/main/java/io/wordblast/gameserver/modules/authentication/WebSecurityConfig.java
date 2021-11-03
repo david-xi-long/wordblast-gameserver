@@ -1,9 +1,12 @@
 package io.wordblast.gameserver.modules.authentication;
 
 import java.util.List;
+import java.util.UUID;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -48,9 +51,19 @@ public class WebSecurityConfig {
             .and()
             .formLogin()
             .loginPage("/api/user/login")
-            .authenticationSuccessHandler((exchange, exception) -> {
-                exchange.getExchange().getResponse().setStatusCode(HttpStatus.OK);
-                return Mono.empty();
+            .authenticationSuccessHandler((exchange, authentication) -> {
+                UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+                UUID userUid = userDetails.getUid();
+
+                byte[] data = String.format("{\"userUid\": \"%s\"}", userUid).getBytes();
+                DataBuffer buffer =
+                    exchange.getExchange().getResponse().bufferFactory().wrap(data);
+
+                ServerHttpResponse response = exchange.getExchange().getResponse();
+
+                response.setStatusCode(HttpStatus.OK);
+
+                return response.writeWith(Mono.just(buffer));
             })
             .authenticationFailureHandler((exchange, exception) -> {
                 exchange.getExchange().getResponse().setStatusCode(HttpStatus.BAD_REQUEST);
@@ -59,7 +72,7 @@ public class WebSecurityConfig {
             .and()
             .logout()
             .logoutUrl("/api/user/logout")
-            .logoutSuccessHandler((exchange, exception) -> {
+            .logoutSuccessHandler((exchange, authentication) -> {
                 exchange.getExchange().getResponse().setStatusCode(HttpStatus.OK);
                 return Mono.empty();
             });

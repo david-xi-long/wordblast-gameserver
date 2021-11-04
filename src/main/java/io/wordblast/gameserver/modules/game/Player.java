@@ -1,5 +1,7 @@
 package io.wordblast.gameserver.modules.game;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.messaging.rsocket.RSocketRequester;
 
@@ -16,6 +18,8 @@ public class Player {
     private int score;
     private boolean authenticated;
     private RSocketRequester connection;
+    private List<Character> usedChars = new ArrayList<>();
+    private List<Character> unusedChars = new ArrayList<>(); 
 
     public Player(String username) {
         this.username = username;
@@ -75,5 +79,20 @@ public class Player {
 
     public void setConnection(RSocketRequester connection) {
         this.connection = connection;
+    }
+
+    public List<Character> getUnusedChars() {
+        return unusedChars;
+    }
+
+    public List<Character> getUsedChars() {
+        return usedChars;
+    }
+
+    public void resetChars() {
+        usedChars.clear();
+        for (char c = 'A'; c <= 'Z'; c++) {
+            unusedChars.add(c);
+        }
     }
 }

@@ -1,10 +1,16 @@
 package io.wordblast.gameserver.modules.game;
 
+import java.util.List;
+import io.wordblast.gameserver.modules.word.WordInfo;
+import io.wordblast.gameserver.modules.word.WordUtils;
+import reactor.core.publisher.Mono;
+
 /**
  * Various methods to help run game logic.
  */
 public class GameService {
     private Game game;
+    private WordUtils wordUtils;
 
     public GameService(Game game) {
         this.game = game;
@@ -21,9 +27,37 @@ public class GameService {
      * @return {@code true} if the word has been used, otherwise {@code false}.
      */
     public boolean checkWord(String word) {
-        // TODO: Check list of used Words.
-        // TODO: Check if word contains current letter combination.
+        Player currentPlayer = game.getCurrentPlayer();
+        // Check list of used Words.
+
+        if (game.getWords().contains(word)) {
+            return false;
+        }
+        // Check if word contains current letter combination.
+
+        if (!word.contains(game.getCurrentLetterCombo())) {
+            return false;
+        }
+        game.addWord(word);
         // TODO: Check other constraints.
+
+        // Check player's used chars.
+
+        List<Character> usedChars = currentPlayer.getUsedChars();
+        List<Character> unusedChars = currentPlayer.getUnusedChars();
+
+        for (Character c: unusedChars) {
+            if (word.indexOf(c) != -1) {
+                unusedChars.remove(c);
+                usedChars.add(c);
+            }
+        }
+
+        if (unusedChars.size() == 0) {
+            currentPlayer.resetChars();
+            currentPlayer.setLives(currentPlayer.getLives() + 1);
+        }
+
         // TODO: Calculate value of word.
 
         return true;

@@ -205,6 +205,7 @@ public class GameSocketController {
     @MessageMapping("change-username")
     public Mono<PacketOutUsernameChange> changeUsername(PacketInUsernameChange packet) {
         UUID gameUid = packet.getGameUid();
+        String oldUsername = packet.getOldUsername();
         String newUsername = packet.getNewUsername();
 
         Game game = GameManager.getGame(gameUid);
@@ -213,18 +214,27 @@ public class GameSocketController {
             return Mono.error(new GameNotFoundException());
         }
 
+        Player playerWithOldUsername = game.getPlayers()
+            .stream()
+            .filter((p) -> p.getUsername().equalsIgnoreCase(oldUsername))
+            .findFirst()
+            .orElse(null);
+
+        if (playerWithOldUsername == null) {
+            return Mono.error(new PlayerNotFoundException());
+        }
+
         boolean usernameExists = game.getPlayers()
             .stream()
+            .filter((p) -> p.getState())
             .anyMatch((p) -> p.getUsername().equalsIgnoreCase(newUsername));
 
         if (usernameExists) {
             return Mono.error(new UsernameTakenException());
         }
 
-        // TODO: Get player of the request, and change username.
-
-        // Validation checks passed, echo the packet.
-        String oldUsername = packet.getOldUsername();
+        // Validation checks passed, change username and echo the packet.
+        playerWithOldUsername.setUsername(newUsername);
 
         PacketOutUsernameChange echoPacket =
             new PacketOutUsernameChange(gameUid, oldUsername, newUsername);

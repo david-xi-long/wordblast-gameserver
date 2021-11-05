@@ -31,6 +31,8 @@ public class Game {
     private int currentRound;
     private Countdown countdown;
     private UUID ownerUid;
+    private Player previousPlayer;
+    private boolean previousOutOfTime;
 
     public Game() {
         this(UUID.randomUUID());
@@ -105,6 +107,14 @@ public class Game {
         this.currentPlayer = currentPlayer;
     }
 
+    public Player getPreviousPlayer() {
+        return previousPlayer;
+    }
+
+    public void setPreviousPlayer(Player previousPlayer) {
+        this.previousPlayer = previousPlayer;
+    }
+
     public Set<Player> getAlivePlayers() {
         return alivePlayers;
     }
@@ -147,5 +157,13 @@ public class Game {
 
     public void setOwner(UUID ownerUid) {
         this.ownerUid = ownerUid;
+    }
+
+    public boolean getPreviousOutOfTime() {
+        return previousOutOfTime;
+    }
+
+    public void setPreviousOutOfTime(boolean previousOutOfTime) {
+        this.previousOutOfTime = previousOutOfTime;
     }
 }

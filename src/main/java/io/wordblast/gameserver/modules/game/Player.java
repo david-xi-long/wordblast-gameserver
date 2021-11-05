@@ -20,6 +20,7 @@ public class Player {
     private RSocketRequester connection;
     private List<Character> usedChars = new ArrayList<>();
     private List<Character> unusedChars = new ArrayList<>(); 
+    private List<Character> newlyUsedChars = new ArrayList<>();
 
     public Player(String username) {
         this.username = username;
@@ -92,8 +93,13 @@ public class Player {
 
     public void resetChars() {
         usedChars.clear();
+        //newlyUsedChars.clear();
         for (char c = 'A'; c <= 'Z'; c++) {
             unusedChars.add(c);
         }
+    }
+
+    public List<Character> getNewlyUsedChars() {
+        return newlyUsedChars;
     }
 }

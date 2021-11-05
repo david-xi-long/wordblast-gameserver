@@ -7,6 +7,7 @@ import io.wordblast.gameserver.modules.game.Player;
 import io.wordblast.gameserver.modules.game.PlayerNotFoundException;
 import io.wordblast.gameserver.modules.game.SocketUtils;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -27,6 +28,7 @@ public final class PacketUtils {
      * @param game the game to send the packet to.
      */
     public static void sendRoundInfo(Game game) {
+        
         UUID gameUid = game.getUid();
         int round = game.getCurrentRound();
         String player = game.getCurrentPlayer().getUsername();
@@ -37,9 +39,34 @@ public final class PacketUtils {
             players[i] = game.getPlayers().get(i).getUsername();
             playerLives[i] = game.getPlayers().get(i).getLives();
         }
+        String previousPlayer = "";
+        if (game.getPreviousPlayer() != null) {
+            previousPlayer = game.getPreviousPlayer().getUsername();
+        }
+        String notificationText = "";
+        
+        if (game.getPreviousOutOfTime()) {
+            notificationText = "You ran out of time!";
+        } else {
+            if (!previousPlayer.equals("")) {
+                List<Character> newlyUsed = game.getPreviousPlayer().getNewlyUsedChars();
+                notificationText = "Your new characters are: ";
+                for (Character c: newlyUsed) {
+                    notificationText += c;
+                    notificationText += ' ';
+                }
+                if (game.getPreviousPlayer().getUsedChars().size() == 0) {
+                    notificationText += ". You have also gained a life";
+                }
+            }
+        }
+        
+        
+        
+        System.out.println(notificationText);
 
         SocketUtils.sendPacket(game, "round-info",
-            new PacketOutRoundInfo(gameUid, round, player, timeRemaining, players, playerLives));
+            new PacketOutRoundInfo(gameUid, round, player, timeRemaining, players, playerLives, previousPlayer, notificationText));
     }
 
     /**

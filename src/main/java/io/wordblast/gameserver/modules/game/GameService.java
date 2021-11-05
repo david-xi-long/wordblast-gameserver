@@ -47,6 +47,8 @@ public class GameService {
         // Check player's used chars.
         List<Character> usedChars = currentPlayer.getUsedChars();
         List<Character> unusedChars = currentPlayer.getUnusedChars();
+        List<Character> newlyUsedChars = currentPlayer.getNewlyUsedChars();
+        newlyUsedChars.clear();
 
         Iterator<Character> iter = unusedChars.iterator();
         while (iter.hasNext()) {
@@ -54,6 +56,7 @@ public class GameService {
             if (word.indexOf(c) != -1) {
                 iter.remove();
                 usedChars.add(c);
+                newlyUsedChars.add(c);
             }
         }
 
@@ -61,8 +64,9 @@ public class GameService {
             currentPlayer.resetChars();
             currentPlayer.setLives(currentPlayer.getLives() + 1);
         }
+        game.setPreviousOutOfTime(false);
         // TODO: Calculate value of word.
-        game.getController().nextRound();
+        game.getController().nextTurn();
         return true;
     }
 

@@ -30,6 +30,7 @@ public class GameController {
         if (game.getStatus().compareTo(GameStatus.STARTED) > 0) {
             return false;
         }
+        
 
         // Do not start the game if not all players are ready.
         // Only count the players that are currently in the game.
@@ -62,6 +63,7 @@ public class GameController {
         }
 
         game.setStatus(GameStatus.STARTED);
+        game.setPreviousOutOfTime(false);
 
         // Start the first round.
         nextRound();
@@ -105,6 +107,7 @@ public class GameController {
 
         // Start the turn of the next player.
         startTurn(nextPlayer);
+        
     }
 
     /**
@@ -113,7 +116,8 @@ public class GameController {
      * @param player the player whose turn should be started.
      */
     public void startTurn(Player player) {
-        // Set the current player of the game.
+        // Set the current and previous player of the game.
+        game.setPreviousPlayer(game.getCurrentPlayer());
         game.setCurrentPlayer(player);
 
         // Set up the turn countdown.
@@ -138,12 +142,14 @@ public class GameController {
                     if (player.getLives() == 0) {
                         game.removePlayer(player);
                     }
+                    game.setPreviousOutOfTime(true);
                     nextTurn();
                 },
                 turnLength,
                 TimeUnit.SECONDS);
 
         // Send a round info packet to the connected clients.
+        
         PacketUtils.sendRoundInfo(game);
     }
 }

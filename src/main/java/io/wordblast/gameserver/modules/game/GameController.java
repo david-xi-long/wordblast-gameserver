@@ -92,6 +92,7 @@ public class GameController {
 
         // If all players have gone, start a new round.
         if (nextIndex == players.size()) {
+        game.setPreviousPlayer(game.getCurrentPlayer());
             game.setCurrentPlayer(null);
             nextRound();
             return;
@@ -117,7 +118,9 @@ public class GameController {
      */
     public void startTurn(Player player) {
         // Set the current and previous player of the game.
-        game.setPreviousPlayer(game.getCurrentPlayer());
+        if (game.getCurrentPlayer() != null) {
+            game.setPreviousPlayer(game.getCurrentPlayer());
+        }
         game.setCurrentPlayer(player);
 
         // Set up the turn countdown.

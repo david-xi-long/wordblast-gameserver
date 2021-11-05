@@ -62,7 +62,7 @@ public class GameService {
             currentPlayer.setLives(currentPlayer.getLives() + 1);
         }
         // TODO: Calculate value of word.
-
+        game.getController().nextRound();
         return true;
     }
 

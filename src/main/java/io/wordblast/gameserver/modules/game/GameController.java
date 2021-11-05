@@ -123,7 +123,14 @@ public class GameController {
         TaskManager.getInstance()
             .registerSingle(
                 taskName,
-                () -> nextTurn(),
+                () -> {
+                    // Decrement current player's lives since timer elapsed
+                    player.setLives(player.getLives() - 1);
+                    if (player.getLives() == 0) {
+                        game.removePlayer(player);
+                    }
+                    nextTurn();
+                },
                 turnLength,
                 TimeUnit.SECONDS);
 

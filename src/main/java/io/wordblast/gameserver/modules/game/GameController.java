@@ -79,22 +79,27 @@ public class GameController {
     public void nextTurn() {
         List<Player> players = game.getPlayers();
         Player currentPlayer = game.getCurrentPlayer();
-        Player nextPlayer;
+        Player nextPlayer = null;
 
-        if (currentPlayer == null) {
-            nextPlayer = players.get(0);
-        } else {
-            int nextIndex = players.indexOf(currentPlayer) + 1;
+        // Get the index of the next player to check.
+        int nextIndex = currentPlayer != null ? players.indexOf(currentPlayer) + 1 : 0;
 
-            if (nextIndex == players.size()) {
-                game.setCurrentPlayer(null);
-                nextRound();
-                return;
-            }
-
-            nextPlayer = players.get(nextIndex);
+        // If all players have gone, start a new round.
+        if (nextIndex == players.size()) {
+            game.setCurrentPlayer(null);
+            nextRound();
+            return;
         }
 
+        // Get the next available player.
+        for (int i = nextIndex; i < players.size(); i++) {
+            nextPlayer = players.get(i);
+            if (nextPlayer.getState()) {
+                break;
+            }
+        }
+
+        // Start the turn of the next player.
         startTurn(nextPlayer);
     }
 

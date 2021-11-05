@@ -66,7 +66,7 @@ public final class PacketUtils {
         System.out.println(notificationText);
 
         SocketUtils.sendPacket(game, "round-info",
-            new PacketOutRoundInfo(gameUid, round, player, timeRemaining, players, playerLives, previousPlayer, notificationText));
+            new PacketOutRoundInfo(gameUid, round, player, timeRemaining, players, playerLives, previousPlayer, notificationText, game.getCurrentLetterCombo()));
     }
 
     /**

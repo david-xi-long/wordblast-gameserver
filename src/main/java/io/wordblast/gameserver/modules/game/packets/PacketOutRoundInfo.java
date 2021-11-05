@@ -15,6 +15,7 @@ public class PacketOutRoundInfo extends Packet {
     private final int[] playerLives;
     private final String previousPlayer;
     private final String notificationText;
+    private final String letterCombo;
 
     /**
      * Creates a new PacketOutRoundInfo instance.
@@ -24,7 +25,7 @@ public class PacketOutRoundInfo extends Packet {
      * @param player the current player of the game.
      * @param timeRemaining the time remaining for the current player.
      */
-    public PacketOutRoundInfo(UUID gameUid, int round, String player, long timeRemaining, String[] players, int[] playerLives, String previousPlayer, String notificationText) {
+    public PacketOutRoundInfo(UUID gameUid, int round, String player, long timeRemaining, String[] players, int[] playerLives, String previousPlayer, String notificationText, String letterCombo) {
         super(PacketType.PACKET_OUT_ROUND_INFO);
         this.gameUid = gameUid;
         this.round = round;
@@ -34,6 +35,7 @@ public class PacketOutRoundInfo extends Packet {
         this.playerLives = playerLives;
         this.previousPlayer = previousPlayer;
         this.notificationText = notificationText;
+        this.letterCombo = letterCombo;
     }
 
     public UUID getGameUid() {
@@ -66,5 +68,9 @@ public class PacketOutRoundInfo extends Packet {
 
     public String getNotificationText() {
         return notificationText;
+    }
+    
+    public String getLetterCombo() {
+        return letterCombo;
     }
 }

@@ -123,6 +123,9 @@ public class GameController {
         }
         game.setCurrentPlayer(player);
 
+        // Set letter combo as "TEST" to show that input checking works
+        game.setCurrentLetterCombo("TEST");
+
         // Set up the turn countdown.
         int turnLength = game.getGameOptions().getTimePerPlayer();
 
@@ -142,9 +145,9 @@ public class GameController {
                 () -> {
                     // Decrement current player's lives since timer elapsed
                     player.setLives(player.getLives() - 1);
-                    if (player.getLives() == 0) {
+                    /*if (player.getLives() == 0) {
                         game.removePlayer(player);
-                    }
+                    }*/
                     game.setPreviousOutOfTime(true);
                     nextTurn();
                 },

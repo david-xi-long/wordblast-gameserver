@@ -34,11 +34,15 @@ public class Game {
 
     public Game() {
         this(UUID.randomUUID());
+        this.usedWords = new HashSet<>();
+        this.usedLetterCombinations = new HashSet<>();
     }
 
     public Game(final UUID uid) {
         this.uid = uid;
         this.status = GameStatus.WAITING;
+        this.usedWords = new HashSet<>();
+
     }
 
     public GameController getController() {

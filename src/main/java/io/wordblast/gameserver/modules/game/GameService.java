@@ -1,5 +1,6 @@
 package io.wordblast.gameserver.modules.game;
 
+import java.util.Iterator;
 import java.util.List;
 import io.wordblast.gameserver.modules.word.WordInfo;
 import io.wordblast.gameserver.modules.word.WordUtils;
@@ -29,26 +30,29 @@ public class GameService {
     public boolean checkWord(String word) {
         Player currentPlayer = game.getCurrentPlayer();
         // Check list of used Words.
-
         if (game.getWords().contains(word)) {
             return false;
         }
-        // Check if word contains current letter combination.
 
-        if (!word.contains(game.getCurrentLetterCombo())) {
-            return false;
+        // Check if word contains current letter combination.
+        // NULL CHECK because we have not implemented letter combo generating yet
+        if (game.getCurrentLetterCombo() != null) { 
+            if (!word.contains(game.getCurrentLetterCombo())) {
+                return false;
+            }
         }
         game.addWord(word);
         // TODO: Check other constraints.
 
         // Check player's used chars.
-
         List<Character> usedChars = currentPlayer.getUsedChars();
         List<Character> unusedChars = currentPlayer.getUnusedChars();
 
-        for (Character c: unusedChars) {
+        Iterator<Character> iter = unusedChars.iterator();
+        while (iter.hasNext()) {
+            Character c = iter.next();
             if (word.indexOf(c) != -1) {
-                unusedChars.remove(c);
+                iter.remove();
                 usedChars.add(c);
             }
         }
@@ -57,7 +61,6 @@ public class GameService {
             currentPlayer.resetChars();
             currentPlayer.setLives(currentPlayer.getLives() + 1);
         }
-
         // TODO: Calculate value of word.
 
         return true;

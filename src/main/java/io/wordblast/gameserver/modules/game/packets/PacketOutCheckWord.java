@@ -16,7 +16,7 @@ public class PacketOutCheckWord extends Packet {
         this.valid = valid;
     }
 
-    public boolean wordIsValid() {
+    public boolean isValid() {
         return valid;
     }
 }

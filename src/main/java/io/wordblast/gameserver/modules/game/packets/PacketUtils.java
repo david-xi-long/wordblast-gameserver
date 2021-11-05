@@ -3,8 +3,11 @@ package io.wordblast.gameserver.modules.game.packets;
 import io.wordblast.gameserver.modules.game.Game;
 import io.wordblast.gameserver.modules.game.GameManager;
 import io.wordblast.gameserver.modules.game.GameNotFoundException;
+import io.wordblast.gameserver.modules.game.Player;
 import io.wordblast.gameserver.modules.game.PlayerNotFoundException;
 import io.wordblast.gameserver.modules.game.SocketUtils;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -28,9 +31,15 @@ public final class PacketUtils {
         int round = game.getCurrentRound();
         String player = game.getCurrentPlayer().getUsername();
         long timeRemaining = game.getCountdown().getTimeRemaining();
+        String[] players = new String[game.getPlayers().size()];
+        int[] playerLives = new int[game.getPlayers().size()];
+        for (int i = 0; i < game.getPlayers().size(); i++) {
+            players[i] = game.getPlayers().get(i).getUsername();
+            playerLives[i] = game.getPlayers().get(i).getLives();
+        }
 
         SocketUtils.sendPacket(game, "round-info",
-            new PacketOutRoundInfo(gameUid, round, player, timeRemaining));
+            new PacketOutRoundInfo(gameUid, round, player, timeRemaining, players, playerLives));
     }
 
     /**

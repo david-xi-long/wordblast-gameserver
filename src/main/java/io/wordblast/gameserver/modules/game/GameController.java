@@ -56,6 +56,10 @@ public class GameController {
         if (game.getStatus().compareTo(GameStatus.STARTED) > 0) {
             return;
         }
+        
+        for (Player p: game.getPlayers()) {
+            p.setLives(game.getGameOptions().getLivesPerPlayer());
+        }
 
         game.setStatus(GameStatus.STARTED);
 

@@ -3,12 +3,10 @@ package io.wordblast.gameserver.modules.game.packets;
 import io.wordblast.gameserver.modules.game.Game;
 import io.wordblast.gameserver.modules.game.GameManager;
 import io.wordblast.gameserver.modules.game.GameNotFoundException;
-import io.wordblast.gameserver.modules.game.Player;
 import io.wordblast.gameserver.modules.game.PlayerNotFoundException;
+import io.wordblast.gameserver.modules.game.PlayerState;
 import io.wordblast.gameserver.modules.game.SocketUtils;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -28,11 +26,11 @@ public final class PacketUtils {
      * @param game the game to send the packet to.
      */
     public static void sendRoundInfo(Game game) {
-        
         UUID gameUid = game.getUid();
         int round = game.getCurrentRound();
         String player = game.getCurrentPlayer().getUsername();
         long timeRemaining = game.getCountdown().getTimeRemaining();
+
         String[] players = new String[game.getPlayers().size()];
         int[] playerLives = new int[game.getPlayers().size()];
         for (int i = 0; i < game.getPlayers().size(); i++) {
@@ -44,14 +42,18 @@ public final class PacketUtils {
             previousPlayer = game.getPreviousPlayer().getUsername();
         }
         String notificationText = "";
-        
+
         if (game.getPreviousOutOfTime()) {
-            notificationText = "You ran out of time!";
+            if (game.getPreviousPlayer().getState() == PlayerState.ELIMINATED) {
+                notificationText = "You have been eliminated!";
+            } else {
+                notificationText = "You ran out of time!";
+            }
         } else {
             if (!previousPlayer.equals("")) {
-                List<Character> newlyUsed = game.getPreviousPlayer().getNewlyUsedChars();
+                Set<Character> newlyUsed = game.getPreviousPlayer().getNewlyUsedChars();
                 notificationText = "Your new characters are: ";
-                for (Character c: newlyUsed) {
+                for (Character c : newlyUsed) {
                     notificationText += c;
                     notificationText += ' ';
                 }
@@ -60,13 +62,10 @@ public final class PacketUtils {
                 }
             }
         }
-        
-        
-        
-        System.out.println(notificationText);
 
         SocketUtils.sendPacket(game, "round-info",
-            new PacketOutRoundInfo(gameUid, round, player, timeRemaining, players, playerLives, previousPlayer, notificationText, game.getCurrentLetterCombo()));
+            new PacketOutRoundInfo(gameUid, round, player, timeRemaining, players, playerLives,
+                previousPlayer, notificationText, game.getCurrentLetterCombo()));
     }
 
     /**

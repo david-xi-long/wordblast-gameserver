@@ -84,7 +84,7 @@ public class GameRestController {
                     .stream()
                     .flatMap((g) -> g.getPlayers()
                         .stream()
-                        .filter((p) -> p.getState()))
+                        .filter((p) -> p.getState() == PlayerState.ACTIVE))
                     .count()));
     }
 

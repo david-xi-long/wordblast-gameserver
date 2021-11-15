@@ -3,6 +3,7 @@ package io.wordblast.gameserver.modules.word;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -27,15 +28,17 @@ public final class WordUtils {
      * Retrieves the information related to a word.
      * 
      * @param word the word to retrieve the information of.
-     * @return the information related to the word.
+     * @return the information related to the word, if found. Otherwise {@code null}.
      */
-    public Mono<WordInfo> getWordInfo(String word) {
-        if (!WordManager.getParsedWords().containsKey(word)) {
-            return Mono.empty();
+    public static Mono<Optional<WordInfo>> getWordInfo(String word) {
+        String lowerCaseWord = word.toLowerCase();
+
+        if (!WordManager.getParsedWords().containsKey(lowerCaseWord)) {
+            return Mono.just(Optional.empty());
         }
 
         return CLIENT.get()
-            .uri("/en/" + word)
+            .uri("/en/" + lowerCaseWord)
             .retrieve()
             .bodyToMono(new ParameterizedTypeReference<WordResponse[]>() {})
             .onErrorResume(WebClientException.class, (ex) -> Mono.empty())
@@ -48,7 +51,8 @@ public final class WordUtils {
                     response.getWord(),
                     meaning.getPartOfSpeech(),
                     definition.getDefinition());
-            });
+            })
+            .map((info) -> Optional.of(info));
     }
 
     /**
@@ -56,26 +60,26 @@ public final class WordUtils {
      * 
      * @return the 2-letter combination.
      */
-    public String getCombination() {
+    public static String getCombination() {
         // For now, only 2-letter combinations with a frequency > 2450 are returned.
         return getCombination(2);
     }
 
-    private String getCombination(int length) {
+    private static String getCombination(int length) {
         return randomCombination(length);
     }
 
-    private int randomLength() {
+    private static int randomLength() {
         Collection<Integer> lengths = WordManager.getParsedCombinations().keySet();
         List<Integer> lengthsCopy = new ArrayList<>(lengths);
         int randomIndex = ThreadLocalRandom.current().nextInt(lengthsCopy.size());
         return lengthsCopy.get(randomIndex);
     }
 
-    private String randomCombination(int length) {
+    private static String randomCombination(int length) {
         Collection<String> combos = WordManager.getParsedCombinations().get(length).keySet();
         List<String> combosCopy = new ArrayList<>(combos);
         int randomIndex = ThreadLocalRandom.current().nextInt(combosCopy.size());
-        return combosCopy.get(randomIndex);
+        return combosCopy.get(randomIndex).toUpperCase();
     }
 }

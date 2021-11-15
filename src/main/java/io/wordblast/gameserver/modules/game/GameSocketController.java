@@ -69,7 +69,6 @@ public class GameSocketController {
 
         Player player = new Player(username);
         player.setConnection(connection);
-        player.setState(true);
 
         game.addPlayer(player);
 
@@ -81,7 +80,7 @@ public class GameSocketController {
 
         SocketUtils.handleDisconnect(connection, () -> {
             // When the player disconnects, set their state to false.
-            player.setState(false);
+            player.setState(PlayerState.DISCONNECTED);
 
             // Inform clients that the player is inactive.
             PacketOutPlayerState inactiveStatePacket =
@@ -103,7 +102,7 @@ public class GameSocketController {
         // TODO: This should not be calculated every single time a player joins.
         Set<PlayerInfo> activePlayerInfos = game.getPlayers()
             .stream()
-            .filter((p) -> p.getState())
+            .filter((p) -> p.getState() == PlayerState.ACTIVE)
             .map((p) -> new PlayerInfo(p.getUsername(), p.isReady()))
             .collect(Collectors.toSet());
 
@@ -132,7 +131,7 @@ public class GameSocketController {
     }
 
     /**
-     * Handles players typing a word while on their turn
+     * Handles players typing a word while on their turn.
      * 
      * @param packet the packet to handle.
      * @return the packet response.
@@ -189,11 +188,19 @@ public class GameSocketController {
      */
     @MessageMapping("check-word")
     public Mono<PacketOutCheckWord> checkWord(PacketInCheckWord packet) {
+        Exception err = PacketUtils.validateGame(packet);
+        if (err != null) {
+            return Mono.error(err);
+        }
+
+        String guess = packet.getWord();
         UUID gameUid = packet.getGameUid();
-        String word = packet.getWord();
+
         Game game = GameManager.getGame(gameUid);
-        GameService service = new GameService(game);
-        return Mono.just(new PacketOutCheckWord(service.checkWord(word)));
+
+        return game.getController()
+            .checkEndTurn(guess)
+            .map((info) -> new PacketOutCheckWord(!info.isEmpty()));
     }
 
     /**
@@ -226,7 +233,7 @@ public class GameSocketController {
 
         boolean usernameExists = game.getPlayers()
             .stream()
-            .filter((p) -> p.getState())
+            .filter((p) -> p.getState() == PlayerState.ACTIVE)
             .anyMatch((p) -> p.getUsername().equalsIgnoreCase(newUsername));
 
         if (usernameExists) {

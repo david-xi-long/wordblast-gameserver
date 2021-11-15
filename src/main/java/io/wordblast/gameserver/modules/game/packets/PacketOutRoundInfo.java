@@ -1,6 +1,5 @@
 package io.wordblast.gameserver.modules.game.packets;
 
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -25,7 +24,9 @@ public class PacketOutRoundInfo extends Packet {
      * @param player the current player of the game.
      * @param timeRemaining the time remaining for the current player.
      */
-    public PacketOutRoundInfo(UUID gameUid, int round, String player, long timeRemaining, String[] players, int[] playerLives, String previousPlayer, String notificationText, String letterCombo) {
+    public PacketOutRoundInfo(UUID gameUid, int round, String player, long timeRemaining,
+        String[] players, int[] playerLives, String previousPlayer, String notificationText,
+        String letterCombo) {
         super(PacketType.PACKET_OUT_ROUND_INFO);
         this.gameUid = gameUid;
         this.round = round;
@@ -69,7 +70,7 @@ public class PacketOutRoundInfo extends Packet {
     public String getNotificationText() {
         return notificationText;
     }
-    
+
     public String getLetterCombo() {
         return letterCombo;
     }

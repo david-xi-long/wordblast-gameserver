@@ -1,7 +1,7 @@
 package io.wordblast.gameserver.modules.game;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.messaging.rsocket.RSocketRequester;
 
@@ -13,17 +13,23 @@ public class Player {
 
     private String username;
     private boolean ready;
-    private boolean state;
+    private PlayerState state;
     private int lives;
     private int score;
     private boolean authenticated;
     private RSocketRequester connection;
-    private List<Character> usedChars = new ArrayList<>();
-    private List<Character> unusedChars = new ArrayList<>(); 
-    private List<Character> newlyUsedChars = new ArrayList<>();
+    private Set<Character> usedChars = new LinkedHashSet<>();
+    private Set<Character> unusedChars = new LinkedHashSet<>();
+    private Set<Character> newlyUsedChars = new LinkedHashSet<>();
 
+    /**
+     * Creates a new Player object.
+     * 
+     * @param username the username of the player.
+     */
     public Player(String username) {
         this.username = username;
+        this.state = PlayerState.ACTIVE;
         resetChars();
     }
 
@@ -47,11 +53,11 @@ public class Player {
         this.ready = ready;
     }
 
-    public boolean getState() {
+    public PlayerState getState() {
         return state;
     }
 
-    public void setState(boolean state) {
+    public void setState(PlayerState state) {
         this.state = state;
     }
 
@@ -83,23 +89,23 @@ public class Player {
         this.connection = connection;
     }
 
-    public List<Character> getUnusedChars() {
+    public Set<Character> getUnusedChars() {
         return unusedChars;
     }
 
-    public List<Character> getUsedChars() {
+    public Set<Character> getUsedChars() {
         return usedChars;
     }
 
     public void resetChars() {
         usedChars.clear();
-        //newlyUsedChars.clear();
+        // newlyUsedChars.clear();
         for (char c = 'A'; c <= 'Z'; c++) {
             unusedChars.add(c);
         }
     }
 
-    public List<Character> getNewlyUsedChars() {
+    public Set<Character> getNewlyUsedChars() {
         return newlyUsedChars;
     }
 }

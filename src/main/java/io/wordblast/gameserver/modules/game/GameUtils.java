@@ -58,7 +58,7 @@ public final class GameUtils {
             .filter((game) -> game.getGameOptions().getVisibility() == GameVisibility.PUBLIC
                 && game.getPlayers()
                     .stream()
-                    .filter((p) -> p.getState())
+                    .filter((p) -> p.getState() == PlayerState.ACTIVE)
                     .count() < 8
                 && game.getStatus() == GameStatus.WAITING)
             .findFirst()

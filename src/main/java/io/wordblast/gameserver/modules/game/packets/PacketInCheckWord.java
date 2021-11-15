@@ -5,7 +5,7 @@ import java.util.UUID;
 /**
  * Packet representing a word being checked.
  */
-public class PacketInCheckWord extends Packet {
+public class PacketInCheckWord extends Packet implements GamePacket {
     private final String word;
     private final UUID gameUid;
 

@@ -165,8 +165,7 @@ public class GameController {
     public Mono<Optional<WordInfo>> checkEndTurn(String guess) {
         Set<String> usedWords = game.getWords();
         String lowerCaseGuess = guess.toLowerCase();
-        String combo = game.getCurrentLetterCombo();
-
+        String combo = game.getCurrentLetterCombo().toLowerCase();
         if (usedWords.contains(guess)
             || !lowerCaseGuess.contains(combo)
             || !WordManager.getParsedWords().containsKey(lowerCaseGuess)) {

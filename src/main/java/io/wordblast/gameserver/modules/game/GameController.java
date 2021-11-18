@@ -1,5 +1,6 @@
 package io.wordblast.gameserver.modules.game;
 
+import io.wordblast.gameserver.modules.game.packets.PacketOutDefinition;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerEliminated;
 import io.wordblast.gameserver.modules.game.packets.PacketUtils;
 import io.wordblast.gameserver.modules.task.TaskManager;
@@ -197,6 +198,9 @@ public class GameController {
 
         endTurn(false);
         nextTurn();
+
+        WordUtils.getWordInfo(guess)
+            .subscribe(value -> SocketUtils.sendPacket(game, "definition", new PacketOutDefinition(value.get().getWord(), value.get().getDefinition())));
 
         return WordUtils.getWordInfo(guess);
     }

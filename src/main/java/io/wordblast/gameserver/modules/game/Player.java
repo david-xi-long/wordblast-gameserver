@@ -16,6 +16,7 @@ public class Player {
     private PlayerState state;
     private int lives;
     private int score;
+    private int xp;
     private boolean authenticated;
     private RSocketRequester connection;
     private Set<Character> usedChars = new LinkedHashSet<>();
@@ -106,6 +107,14 @@ public class Player {
         for (char c = 'A'; c <= 'Z'; c++) {
             unusedChars.add(c);
         }
+    }
+
+    public void incrementXP(int xp) {
+        this.xp += xp;
+    }
+
+    public int getXP() {
+        return xp;
     }
 
     public Set<Character> getNewlyUsedChars() {

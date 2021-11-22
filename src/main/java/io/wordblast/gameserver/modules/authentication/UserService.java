@@ -1,6 +1,7 @@
 package io.wordblast.gameserver.modules.authentication;
 
 import io.wordblast.gameserver.modules.database.UserRepository;
+import io.wordblast.gameserver.modules.game.Player;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,6 +36,27 @@ public class UserService {
                 newUser.setHashedPassword(passwordEncoder.encode(userDto.getPassword()));
 
                 return userRepository.insert(newUser)
+                    .toFuture();
+            });
+    }
+    
+    /**
+     * Attempts to update a user.
+     * 
+     * @param Player the player in a game to update.
+     * @return the updated user, if successful.
+     */
+    public CompletableFuture<User> updateUser(Player player) {
+        return userRepository.findById(player.getEmail())
+            .toFuture()
+            .thenCompose((userFound) -> {
+                if (userFound == null) {
+                    return CompletableFuture.failedFuture(new UserDoesNotExistException());
+                }
+
+                userFound.setGamesPlayed(userFound.getGamesPlayed() + 1);
+
+                return userRepository.save(userFound)
                     .toFuture();
             });
     }

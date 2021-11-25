@@ -6,10 +6,19 @@ package io.wordblast.gameserver.modules.game;
 public class PlayerInfo {
     private final String username;
     private final boolean ready;
+    private final int lives;
 
-    public PlayerInfo(String username, boolean ready) {
+    /**
+     * Creates a new PlayerInfo instance.
+     * 
+     * @param username the username of the player.
+     * @param ready the ready state of the player.
+     * @param lives the remaining lives of the player.
+     */
+    public PlayerInfo(String username, boolean ready, int lives) {
         this.username = username;
         this.ready = ready;
+        this.lives = lives;
     }
 
     public String getUsername() {
@@ -18,5 +27,13 @@ public class PlayerInfo {
 
     public boolean isReady() {
         return ready;
+    }
+
+    public int getLives() {
+        return lives;
+    }
+
+    public static PlayerInfo of(Player player) {
+        return new PlayerInfo(player.getUsername(), player.isReady(), player.getLives());
     }
 }

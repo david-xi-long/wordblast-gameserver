@@ -26,45 +26,42 @@ public final class PacketUtils {
      * @param game the game to send the packet to.
      */
     public static void sendRoundInfo(Game game) {
-        UUID gameUid = game.getUid();
-        int round = game.getCurrentRound();
-        String player = game.getCurrentPlayer().getUsername();
-        long timeRemaining = game.getCountdown().getTimeRemaining();
-
-        String[] players = new String[game.getPlayers().size()];
-        int[] playerLives = new int[game.getPlayers().size()];
-        for (int i = 0; i < game.getPlayers().size(); i++) {
-            players[i] = game.getPlayers().get(i).getUsername();
-            playerLives[i] = game.getPlayers().get(i).getLives();
-        }
         String previousPlayer = "";
+
         if (game.getPreviousPlayer() != null) {
             previousPlayer = game.getPreviousPlayer().getUsername();
         }
+
         String notificationText = "";
 
         if (game.getPreviousOutOfTime()) {
-            if (game.getPreviousPlayer().getState() == PlayerState.ELIMINATED) {
-                notificationText = "You have been eliminated!";
-            } else {
-                notificationText = "You ran out of time!";
-            }
+            // if (game.getPreviousPlayer().getState() == PlayerState.ELIMINATED) {
+            // notificationText = "You have been eliminated!";
+            // } else {
+            // notificationText = "You ran out of time!";
+            // }
         } else {
-            if (!previousPlayer.equals("")) {
-                Set<Character> newlyUsed = game.getPreviousPlayer().getNewlyUsedChars();
-                notificationText = "Your new characters are: ";
-                for (Character c : newlyUsed) {
-                    notificationText += c;
-                    notificationText += ' ';
-                }
-                if (game.getPreviousPlayer().getUsedChars().size() == 0) {
-                    notificationText += ". You have also gained a life";
-                }
-            }
+            // if (!previousPlayer.equals("")) {
+            // Set<Character> newlyUsed = game.getPreviousPlayer().getNewlyUsedChars();
+            // notificationText = "Your new characters are: ";
+            // for (Character c : newlyUsed) {
+            // notificationText += c;
+            // notificationText += ' ';
+            // }
+            // if (game.getPreviousPlayer().getUsedChars().size() == 0) {
+            // notificationText += ". You have also gained a life";
+            // }
+            // }
         }
 
+        UUID gameUid = game.getUid();
+        int round = game.getCurrentRound();
+        String currentPlayer = game.getCurrentPlayer().getUsername();
+        long turnLength = game.getGameOptions().getTimePerPlayer();
+        long timeRemaining = game.getCountdown().getTimeRemaining();
+
         SocketUtils.sendPacket(game, "round-info",
-            new PacketOutRoundInfo(gameUid, round, player, timeRemaining, players, playerLives,
+            new PacketOutRoundInfo(gameUid, round, currentPlayer, timeRemaining, turnLength,
                 previousPlayer, notificationText, game.getCurrentLetterCombo()));
     }
 

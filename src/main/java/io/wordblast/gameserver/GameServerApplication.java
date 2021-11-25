@@ -1,6 +1,5 @@
 package io.wordblast.gameserver;
 
-import java.util.Map;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.mongo.MongoReactiveDataAutoConfiguration;
@@ -22,13 +21,6 @@ public class GameServerApplication {
      */
     public static void main(String[] args) {
         SpringApplication application = new SpringApplication(GameServerApplication.class);
-
-        application.setDefaultProperties(Map.of(
-            "server.error.include-message", "always",
-            "spring.main.web-application-type", "reactive",
-            "spring.rsocket.server.port", "7000",
-            "spring.rsocket.server.transport", "websocket"));
-
         application.run(args);
     }
 }

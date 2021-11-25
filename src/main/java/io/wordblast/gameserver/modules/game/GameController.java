@@ -1,5 +1,6 @@
 package io.wordblast.gameserver.modules.game;
 
+import io.wordblast.gameserver.modules.game.packets.PacketOutLivesChange;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerEliminated;
 import io.wordblast.gameserver.modules.game.packets.PacketUtils;
 import io.wordblast.gameserver.modules.task.TaskManager;
@@ -210,6 +211,10 @@ public class GameController {
 
         if (outOfTime) {
             currentPlayer.setLives(currentPlayer.getLives() - 1);
+
+            SocketUtils.sendPacket(game, "lives-change",
+                new PacketOutLivesChange(currentPlayer.getUsername(), currentPlayer.getLives()));
+
             checkElimination(currentPlayer);
         }
 

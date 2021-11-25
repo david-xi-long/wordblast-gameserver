@@ -34,12 +34,20 @@ public class Game {
     private Player previousPlayer;
     private boolean previousOutOfTime;
 
+    /**
+     * Create a new Game instance.
+     */
     public Game() {
         this(UUID.randomUUID());
         this.usedWords = new HashSet<>();
         this.usedLetterCombinations = new HashSet<>();
     }
 
+    /**
+     * Create a new Game intance.
+     * 
+     * @param uid the unique identifier of the game.
+     */
     public Game(final UUID uid) {
         this.uid = uid;
         this.status = GameStatus.WAITING;

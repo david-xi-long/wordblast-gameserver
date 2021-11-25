@@ -2,7 +2,6 @@ package io.wordblast.gameserver.modules.game;
 
 import io.wordblast.gameserver.modules.game.packets.PacketInCheckWord;
 import io.wordblast.gameserver.modules.game.packets.PacketInGameJoin;
-import io.wordblast.gameserver.modules.game.packets.PacketInNextTurn;
 import io.wordblast.gameserver.modules.game.packets.PacketInPlayerMessage;
 import io.wordblast.gameserver.modules.game.packets.PacketInPlayerReadyState;
 import io.wordblast.gameserver.modules.game.packets.PacketInSettingChange;
@@ -12,10 +11,10 @@ import io.wordblast.gameserver.modules.game.packets.PacketInUsernameSelect;
 import io.wordblast.gameserver.modules.game.packets.PacketOutCheckWord;
 import io.wordblast.gameserver.modules.game.packets.PacketOutException;
 import io.wordblast.gameserver.modules.game.packets.PacketOutGameInfo;
-import io.wordblast.gameserver.modules.game.packets.PacketOutNextTurn;
+import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerJoin;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerMessage;
+import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerQuit;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerReadyState;
-import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerState;
 import io.wordblast.gameserver.modules.game.packets.PacketOutSettingChange;
 import io.wordblast.gameserver.modules.game.packets.PacketOutStartGame;
 import io.wordblast.gameserver.modules.game.packets.PacketOutUsernameChange;
@@ -67,26 +66,25 @@ public class GameSocketController {
             return Mono.error(new UsernameTakenException());
         }
 
+        int defaultLives = game.getGameOptions().getLivesPerPlayer();
+
         Player player = new Player(username);
         player.setConnection(connection);
+        player.setLives(defaultLives);
 
         game.addPlayer(player);
 
         // Inform clients that the player is active.
-        PacketOutPlayerState activeStatePacket =
-            new PacketOutPlayerState(player.getUsername(), true);
-
-        SocketUtils.sendPacket(game, "player-state", activeStatePacket);
+        SocketUtils.sendPacket(game, "player-join",
+            new PacketOutPlayerJoin(PlayerInfo.of(player)));
 
         SocketUtils.handleDisconnect(connection, () -> {
             // When the player disconnects, set their state to false.
             player.setState(PlayerState.DISCONNECTED);
 
             // Inform clients that the player is inactive.
-            PacketOutPlayerState inactiveStatePacket =
-                new PacketOutPlayerState(player.getUsername(), false);
-
-            SocketUtils.sendPacket(game, "player-state", inactiveStatePacket);
+            SocketUtils.sendPacket(game, "player-quit",
+                new PacketOutPlayerQuit(PlayerInfo.of(player)));
         });
 
         GameOptions options = game.getGameOptions();
@@ -103,7 +101,7 @@ public class GameSocketController {
         Set<PlayerInfo> activePlayerInfos = game.getPlayers()
             .stream()
             .filter((p) -> p.getState() == PlayerState.ACTIVE)
-            .map((p) -> new PlayerInfo(p.getUsername(), p.isReady()))
+            .map(PlayerInfo::of)
             .collect(Collectors.toSet());
 
         return Mono.just(
@@ -268,21 +266,6 @@ public class GameSocketController {
         game.setStatus(GameStatus.STARTED);
         PacketOutStartGame outPacket = new PacketOutStartGame(gameUid, players);
         SocketUtils.sendPacket(game, "start-game", outPacket);
-        return Mono.empty();
-    }
-
-    /**
-     * Handles the next turn request.
-     * 
-     * @param packet the packet to handle.
-     * @return the packet response.
-     */
-    @MessageMapping("next-turn")
-    public Mono<Void> nextTurn(@Payload PacketInNextTurn packet) {
-        UUID gameUid = packet.getGameUid();
-        Game game = GameManager.getGame(gameUid);
-        PacketOutNextTurn outPacket = new PacketOutNextTurn("test", 180);
-        SocketUtils.sendPacket(game, "next-turn", outPacket);
         return Mono.empty();
     }
 

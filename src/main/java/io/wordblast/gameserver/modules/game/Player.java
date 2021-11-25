@@ -97,6 +97,9 @@ public class Player {
         return usedChars;
     }
 
+    /**
+     * Resets the used characters of the player.
+     */
     public void resetChars() {
         usedChars.clear();
         // newlyUsedChars.clear();

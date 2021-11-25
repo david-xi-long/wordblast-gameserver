@@ -10,8 +10,7 @@ public class PacketOutRoundInfo extends Packet {
     private final int round;
     private final String player;
     private final long timeRemaining;
-    private final String[] players;
-    private final int[] playerLives;
+    private final long turnLength;
     private final String previousPlayer;
     private final String notificationText;
     private final String letterCombo;
@@ -25,15 +24,14 @@ public class PacketOutRoundInfo extends Packet {
      * @param timeRemaining the time remaining for the current player.
      */
     public PacketOutRoundInfo(UUID gameUid, int round, String player, long timeRemaining,
-        String[] players, int[] playerLives, String previousPlayer, String notificationText,
-        String letterCombo) {
+        long turnLength, String previousPlayer,
+        String notificationText, String letterCombo) {
         super(PacketType.PACKET_OUT_ROUND_INFO);
         this.gameUid = gameUid;
         this.round = round;
         this.player = player;
         this.timeRemaining = timeRemaining;
-        this.players = players;
-        this.playerLives = playerLives;
+        this.turnLength = turnLength;
         this.previousPlayer = previousPlayer;
         this.notificationText = notificationText;
         this.letterCombo = letterCombo;
@@ -55,12 +53,8 @@ public class PacketOutRoundInfo extends Packet {
         return timeRemaining;
     }
 
-    public String[] getPlayers() {
-        return players;
-    }
-
-    public int[] getPlayerLives() {
-        return playerLives;
+    public long getTurnLength() {
+        return turnLength;
     }
 
     public String getPreviousPlayer() {

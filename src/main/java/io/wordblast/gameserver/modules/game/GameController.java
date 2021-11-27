@@ -67,10 +67,6 @@ public class GameController {
             return;
         }
 
-        for (Player p : game.getPlayers()) {
-            p.setLives(game.getGameOptions().getLivesPerPlayer());
-        }
-
         game.setStatus(GameStatus.STARTED);
         game.setPreviousOutOfTime(false);
 
@@ -198,7 +194,6 @@ public class GameController {
         }
 
         endTurn(false);
-        nextTurn();
 
         WordUtils.getWordInfo(guess)
             .subscribe(value -> SocketUtils.sendPacket(game, "definition",

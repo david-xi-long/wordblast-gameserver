@@ -112,11 +112,11 @@ public class Player {
         }
     }
 
-    public void incrementXP(int xp) {
+    public void incrementXp(int xp) {
         this.xp += xp;
     }
 
-    public int getXP() {
+    public int getXp() {
         return xp;
     }
 

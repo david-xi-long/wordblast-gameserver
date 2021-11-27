@@ -11,6 +11,7 @@ import io.wordblast.gameserver.modules.game.packets.PacketInUsernameSelect;
 import io.wordblast.gameserver.modules.game.packets.PacketOutCheckWord;
 import io.wordblast.gameserver.modules.game.packets.PacketOutException;
 import io.wordblast.gameserver.modules.game.packets.PacketOutGameInfo;
+import io.wordblast.gameserver.modules.game.packets.PacketOutLivesChange;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerJoin;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerMessage;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerQuit;
@@ -97,7 +98,6 @@ public class GameSocketController {
         settings.put("extraLives", String.valueOf(options.earnsExtraLives()));
         settings.put("increasingDifficulty", String.valueOf(options.increasesDifficulty()));
 
-        // TODO: This should not be calculated every single time a player joins.
         Set<PlayerInfo> activePlayerInfos = game.getPlayers()
             .stream()
             .filter((p) -> p.getState() == PlayerState.ACTIVE)
@@ -343,7 +343,17 @@ public class GameSocketController {
                     Boolean.valueOf(value) ? GameVisibility.PUBLIC : GameVisibility.PRIVATE);
                 break;
             case "playerLives":
-                options.setLivesPerPlayer(Integer.valueOf(value));
+                int newLives = Integer.valueOf(value);
+
+                options.setLivesPerPlayer(newLives);
+
+                for (Player player : game.getPlayers()) {
+                    player.setLives(newLives);
+
+                    SocketUtils.sendPacket(game, "lives-change",
+                        new PacketOutLivesChange(player.getUsername(), newLives));
+                }
+
                 break;
             case "timePerPlayer":
                 options.setTimePerPlayer(Integer.valueOf(value));

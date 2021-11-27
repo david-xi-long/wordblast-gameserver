@@ -34,6 +34,8 @@ public final class PacketUtils {
 
         String notificationText = "";
 
+        // TODO: Temporarily commented out because the backend is not sending round info packets
+        // after the first round.
         if (game.getPreviousOutOfTime()) {
             // if (game.getPreviousPlayer().getState() == PlayerState.ELIMINATED) {
             // notificationText = "You have been eliminated!";

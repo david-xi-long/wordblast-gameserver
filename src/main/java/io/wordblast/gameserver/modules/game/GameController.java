@@ -1,5 +1,6 @@
 package io.wordblast.gameserver.modules.game;
 
+import io.wordblast.gameserver.modules.game.packets.PacketOutGameEnd;
 import io.wordblast.gameserver.modules.game.packets.PacketOutLivesChange;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerEliminated;
 import io.wordblast.gameserver.modules.game.packets.PacketUtils;
@@ -146,7 +147,6 @@ public class GameController {
                 taskName,
                 () -> {
                     endTurn(true);
-                    nextTurn();
                 },
                 turnLength,
                 TimeUnit.SECONDS);
@@ -219,6 +219,14 @@ public class GameController {
         }
 
         game.setPreviousOutOfTime(outOfTime);
+
+        boolean gameEnded = checkGameEnd();
+
+        if (gameEnded) {
+            return;
+        }
+
+        nextTurn();
     }
 
     /**
@@ -247,5 +255,34 @@ public class GameController {
 
         SocketUtils.sendPacket(game, "player-eliminated",
             new PacketOutPlayerEliminated(player.getUsername()));
+    }
+
+    /**
+     * Checks if the game should end. If all players have been eliminated, the game will end.
+     * 
+     * @return {@code true} if the game ended, otherwise {@code false}.
+     */
+    public boolean checkGameEnd() {
+        if (game.getStatus() == GameStatus.FINISHED) {
+            return true;
+        }
+
+        boolean shouldEnd = game.getPlayers()
+            .stream()
+            .filter((player) -> player.getState() == PlayerState.ACTIVE)
+            .allMatch((player) -> player.getLives() == 0);
+
+        if (shouldEnd) {
+            endGame();
+        }
+
+        return shouldEnd;
+    }
+
+    /**
+     * Ends the game.
+     */
+    public void endGame() {
+        SocketUtils.sendPacket(game, "game-end", new PacketOutGameEnd());
     }
 }

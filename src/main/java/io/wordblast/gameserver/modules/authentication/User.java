@@ -14,6 +14,10 @@ public class User {
     private String email;
     private String hashedPassword;
     private int experience;
+    private int gamesPlayed;
+    private int totalWords;
+    private int totalTimeElapsed;
+    private double WPM;
 
     /**
      * Creates a new user object with the default values.
@@ -34,6 +38,10 @@ public class User {
         this.email = email;
         this.hashedPassword = hashedPassword;
         this.experience = 0;
+        this.gamesPlayed = 0;
+        this.totalWords = 0;
+        this.totalTimeElapsed = 0;
+        this.WPM = 0;
     }
 
     public void setUid(UUID uuid) {
@@ -67,4 +75,37 @@ public class User {
     public void addExperience(int xp) {
         this.experience += xp;
     }
+
+    public int getGamesPlayed() {
+        return this.gamesPlayed;
+    }
+
+    public void setGamesPlayed(int gamesPlayed) {
+        this.gamesPlayed = gamesPlayed;
+    }
+
+    public int getTotalWords() {
+        return this.totalWords;
+    }
+
+    public void setTotalWords(int totalWords) {
+        this.totalWords = totalWords;
+    }
+
+    public int getTotalTimeElapsed() {
+        return this.totalTimeElapsed;
+    }
+
+    public void setTotalTimeElapsed(int totalTimeElapsed) {
+        this.totalTimeElapsed = totalTimeElapsed;
+    }
+
+    public double getWPM() {
+        return this.WPM;
+    }
+
+    public void setWPM(int WPM) {
+        this.WPM = WPM;
+    }
+    
 }

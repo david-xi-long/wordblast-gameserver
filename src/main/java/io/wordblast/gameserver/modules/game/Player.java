@@ -16,11 +16,15 @@ public class Player {
     private PlayerState state;
     private int lives;
     private int score;
+    private int xp;
     private boolean authenticated;
     private RSocketRequester connection;
     private Set<Character> usedChars = new LinkedHashSet<>();
     private Set<Character> unusedChars = new LinkedHashSet<>();
     private Set<Character> newlyUsedChars = new LinkedHashSet<>();
+    private Set<String> usedWords = new LinkedHashSet<>();
+    private String email;
+    private int timeElapsed;
 
     /**
      * Creates a new Player object.
@@ -108,7 +112,39 @@ public class Player {
         }
     }
 
+    public void incrementXP(int xp) {
+        this.xp += xp;
+    }
+
+    public int getXP() {
+        return xp;
+    }
+
     public Set<Character> getNewlyUsedChars() {
         return newlyUsedChars;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Set<String> getUsedWords() {
+        return usedWords;
+    }
+
+    public void addWord(String word) {
+        this.usedWords.add(word);
+    }
+
+    public int getTimeElapsed() {
+        return timeElapsed;
+    }
+
+    public void setTimeElapsed(int timeElapsed) {
+        this.timeElapsed = timeElapsed;
     }
 }

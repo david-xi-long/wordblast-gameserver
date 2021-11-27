@@ -1,5 +1,6 @@
 package io.wordblast.gameserver.modules.game;
 
+import io.wordblast.gameserver.modules.game.packets.PacketOutDefinition;
 import io.wordblast.gameserver.modules.game.packets.PacketOutGameEnd;
 import io.wordblast.gameserver.modules.game.packets.PacketOutLivesChange;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerEliminated;
@@ -166,8 +167,7 @@ public class GameController {
     public Mono<Optional<WordInfo>> checkEndTurn(String guess) {
         Set<String> usedWords = game.getWords();
         String lowerCaseGuess = guess.toLowerCase();
-        String combo = game.getCurrentLetterCombo();
-
+        String combo = game.getCurrentLetterCombo().toLowerCase();
         if (usedWords.contains(guess)
             || !lowerCaseGuess.contains(combo)
             || !WordManager.getParsedWords().containsKey(lowerCaseGuess)) {
@@ -199,6 +199,10 @@ public class GameController {
 
         endTurn(false);
         nextTurn();
+
+        WordUtils.getWordInfo(guess)
+            .subscribe(value -> SocketUtils.sendPacket(game, "definition",
+                new PacketOutDefinition(value.get().getWord(), value.get().getDefinition())));
 
         return WordUtils.getWordInfo(guess);
     }

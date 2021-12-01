@@ -9,7 +9,8 @@ import org.springframework.messaging.rsocket.RSocketRequester;
  * Represents a player within a game.
  */
 public class Player {
-    private final UUID uid = UUID.randomUUID();
+    //private final UUID uid = UUID.randomUUID();
+    private final UUID uid;
 
     private String username;
     private boolean ready;
@@ -31,9 +32,15 @@ public class Player {
      * 
      * @param username the username of the player.
      */
-    public Player(String username) {
+    public Player(String username, UUID uid) {
         this.username = username;
         this.state = PlayerState.ACTIVE;
+        if (uid != null) {
+            this.uid = uid;
+            
+        } else {
+            this.uid = UUID.randomUUID();
+        }
         resetChars();
     }
 

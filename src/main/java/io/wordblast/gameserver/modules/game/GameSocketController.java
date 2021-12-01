@@ -1,5 +1,7 @@
 package io.wordblast.gameserver.modules.game;
 
+import io.wordblast.gameserver.modules.authentication.UserService;
+import io.wordblast.gameserver.modules.database.UserRepository;
 import io.wordblast.gameserver.modules.game.packets.PacketInCheckWord;
 import io.wordblast.gameserver.modules.game.packets.PacketInGameJoin;
 import io.wordblast.gameserver.modules.game.packets.PacketInPlayerMessage;
@@ -48,6 +50,7 @@ public class GameSocketController {
     public Mono<PacketOutGameInfo> joinGame(PacketInGameJoin packet, RSocketRequester connection) {
         UUID gameUid = packet.getGameUid();
         String username = packet.getUsername();
+        UUID playerUid = packet.getPlayerUid();
 
         Game game = GameManager.getGame(gameUid);
 
@@ -69,7 +72,7 @@ public class GameSocketController {
 
         int defaultLives = game.getGameOptions().getLivesPerPlayer();
 
-        Player player = new Player(username);
+        Player player = new Player(username, playerUid);
         player.setConnection(connection);
         player.setLives(defaultLives);
 

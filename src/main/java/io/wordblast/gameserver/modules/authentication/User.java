@@ -9,8 +9,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Document(collection = "users")
 public class User {
-    private UUID uid;
     @Id
+    private UUID uid;
     private String email;
     private String hashedPassword;
     private int experience;

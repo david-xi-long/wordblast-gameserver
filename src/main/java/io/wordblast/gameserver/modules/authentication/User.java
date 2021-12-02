@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class User {
     @Id
     private UUID uid;
+    private String idAsString;
     private String email;
     private String hashedPassword;
     private int experience;
@@ -18,6 +19,7 @@ public class User {
     private int totalWords;
     private int totalTimeElapsed;
     private double WPM;
+    private int level;
 
     /**
      * Creates a new user object with the default values.
@@ -42,6 +44,8 @@ public class User {
         this.totalWords = 0;
         this.totalTimeElapsed = 0;
         this.WPM = 0;
+        this.idAsString = uid.toString();
+        this.level = 0;
     }
 
     public void setUid(UUID uuid) {
@@ -106,6 +110,22 @@ public class User {
 
     public void setWPM(int WPM) {
         this.WPM = WPM;
+    }
+
+    public String getIdAsString() {
+        return this.idAsString;
+    }
+
+    public void setIdAsString(String idAsString) {
+        this.idAsString = idAsString;
+    }
+
+    public int getLevel() {
+        return this.level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
     }
     
 }

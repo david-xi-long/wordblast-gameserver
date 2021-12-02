@@ -47,21 +47,15 @@ public class UserService {
      * @return the updated user, if successful.
      */
     public CompletableFuture<User> updateUser(Player player) {
-        System.out.println("Reached update user");
-        return userRepository.findById(player.getUid().toString())
+        return userRepository.findByIdAsString(player.getUid().toString())
             .toFuture()
             .thenCompose((userFound) -> {
-                System.out.println(player.getEmail());
-                
-                if (userFound == null) {
-                    System.out.println("Failure");
-                    return CompletableFuture.failedFuture(new UserDoesNotExistException());
-                }
-
                 userFound.setGamesPlayed(userFound.getGamesPlayed() + 1);
-                System.out.println("Succes");
+                userFound.setTotalWords(userFound.getTotalWords() + player.getUsedWords().size());
+                userFound.addExperience(player.getXp());
 
-
+                // Update WPM, Level, Total Time Elapsed, most used words
+                
                 return userRepository.save(userFound)
                     .toFuture();
             });

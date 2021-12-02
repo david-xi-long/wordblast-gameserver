@@ -85,6 +85,10 @@ public class GameSocketController {
         SocketUtils.handleDisconnect(connection, () -> {
             // When the player disconnects, set their state to false.
             player.setState(PlayerState.DISCONNECTED);
+            // System.out.println("Player disconnected");
+            // System.out.println("Player username: " + player.getUsername());
+            // System.out.println("Player accumulated xp: " + player.getXp());
+            // System.out.println("Player User UID: " + playerUid);
 
             // Inform clients that the player is inactive.
             SocketUtils.sendPacket(game, "player-quit",

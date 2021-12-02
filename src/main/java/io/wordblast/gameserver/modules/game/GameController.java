@@ -177,6 +177,7 @@ public class GameController {
 
         Player currentPlayer = game.getCurrentPlayer();
         currentPlayer.addWord(guess);
+        currentPlayer.incrementXp(lowerCaseGuess.length());
         Set<Character> usedChars = currentPlayer.getUsedChars();
         Set<Character> unusedChars = currentPlayer.getUnusedChars();
         Set<Character> newlyUsedChars = currentPlayer.getNewlyUsedChars();

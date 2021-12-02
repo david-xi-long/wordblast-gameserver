@@ -50,11 +50,10 @@ public class UserService {
         return userRepository.findByIdAsString(player.getUid().toString())
             .toFuture()
             .thenCompose((userFound) -> {
+                // Update WPM, level, total words, total games played, and experience
                 userFound.setGamesPlayed(userFound.getGamesPlayed() + 1);
                 userFound.setTotalWords(userFound.getTotalWords() + player.getUsedWords().size());
                 userFound.addExperience(player.getXp());
-
-                // Update WPM, Level, Total Time Elapsed, most used words
                 
                 return userRepository.save(userFound)
                     .toFuture();

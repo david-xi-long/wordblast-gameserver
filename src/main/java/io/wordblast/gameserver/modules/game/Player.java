@@ -1,6 +1,7 @@
 package io.wordblast.gameserver.modules.game;
 
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import org.springframework.messaging.rsocket.RSocketRequester;
@@ -12,6 +13,7 @@ public class Player {
     private final UUID uid = UUID.randomUUID();
 
     private String username;
+    private Map<String, Object> bigHeadOptions;
     private boolean ready;
     private PlayerState state;
     private int lives;
@@ -47,6 +49,14 @@ public class Player {
 
     public void setUsername(String name) {
         this.username = name;
+    }
+
+    public Map<String, Object> getBigHeadOptions() {
+        return bigHeadOptions;
+    }
+
+    public void setBigHeadOptions(Map<String, Object> bigHeadOptions) {
+        this.bigHeadOptions = bigHeadOptions;
     }
 
     public boolean isReady() {

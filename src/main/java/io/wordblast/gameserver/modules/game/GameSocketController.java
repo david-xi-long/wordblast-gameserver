@@ -70,6 +70,7 @@ public class GameSocketController {
         int defaultLives = game.getGameOptions().getLivesPerPlayer();
 
         Player player = new Player(username);
+        player.setBigHeadOptions(packet.getBigHeadOptions());
         player.setConnection(connection);
         player.setLives(defaultLives);
 

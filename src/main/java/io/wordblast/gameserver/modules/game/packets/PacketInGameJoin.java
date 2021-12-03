@@ -9,6 +9,7 @@ import java.util.UUID;
 public final class PacketInGameJoin extends Packet {
     private final UUID gameUid;
     private final String username;
+    private final UUID playerUid;
     private final Map<String, Object> bigHeadOptions;
 
     /**
@@ -18,10 +19,12 @@ public final class PacketInGameJoin extends Packet {
      * @param username the username of the player.
      * @param bigHeadOptions the big head options of the player.
      */
-    public PacketInGameJoin(UUID gameUid, String username, Map<String, Object> bigHeadOptions) {
+    public PacketInGameJoin(UUID gameUid, String username, UUID playerUid,
+        Map<String, Object> bigHeadOptions) {
         super(PacketType.PACKET_IN_GAME_JOIN);
         this.gameUid = gameUid;
         this.username = username;
+        this.playerUid = playerUid;
         this.bigHeadOptions = bigHeadOptions;
     }
 
@@ -31,6 +34,10 @@ public final class PacketInGameJoin extends Packet {
 
     public String getUsername() {
         return username;
+    }
+
+    public UUID getPlayerUid() {
+        return playerUid;
     }
 
     public Map<String, Object> getBigHeadOptions() {

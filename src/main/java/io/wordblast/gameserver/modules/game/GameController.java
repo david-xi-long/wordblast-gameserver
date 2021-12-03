@@ -1,5 +1,7 @@
 package io.wordblast.gameserver.modules.game;
 
+import io.wordblast.gameserver.ApplicationContextUtils;
+import io.wordblast.gameserver.modules.authentication.UserService;
 import io.wordblast.gameserver.modules.game.packets.PacketOutDefinition;
 import io.wordblast.gameserver.modules.game.packets.PacketOutGameEnd;
 import io.wordblast.gameserver.modules.game.packets.PacketOutLivesChange;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import org.springframework.context.ApplicationContext;
 import reactor.core.publisher.Mono;
 
 /**
@@ -21,7 +24,7 @@ import reactor.core.publisher.Mono;
  */
 public class GameController {
     private final Game game;
-
+    
     public GameController(Game game) {
         this.game = game;
     }
@@ -173,6 +176,8 @@ public class GameController {
         usedWords.add(guess);
 
         Player currentPlayer = game.getCurrentPlayer();
+        currentPlayer.addWord(guess);
+        currentPlayer.incrementXp(lowerCaseGuess.length());
         Set<Character> usedChars = currentPlayer.getUsedChars();
         Set<Character> unusedChars = currentPlayer.getUnusedChars();
         Set<Character> newlyUsedChars = currentPlayer.getNewlyUsedChars();
@@ -283,5 +288,14 @@ public class GameController {
      */
     public void endGame() {
         SocketUtils.sendPacket(game, "game-end", new PacketOutGameEnd());
+        game.getPlayers()
+            .stream()
+            .forEach((player) -> {
+                ApplicationContext appCtx = ApplicationContextUtils.getApplicationContext();
+                //UserUtils utils = appCtx.getBean("userUtils", UserUtils.class);
+                //utils.updateUser(player);
+                UserService userService = appCtx.getBean("userService", UserService.class);
+                userService.updateUser(player);
+            });
     }
 }

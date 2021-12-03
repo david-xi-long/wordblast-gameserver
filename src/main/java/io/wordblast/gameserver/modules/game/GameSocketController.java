@@ -46,10 +46,7 @@ public class GameSocketController {
      */
     @MessageMapping("join-game")
     public Mono<PacketOutGameInfo> joinGame(PacketInGameJoin packet, RSocketRequester connection) {
-        UUID gameUid = packet.getGameUid();
-        String username = packet.getUsername();
-
-        Game game = GameManager.getGame(gameUid);
+        Game game = GameManager.getGame(packet.getGameUid());
 
         if (game == null) {
             return Mono.error(new GameNotFoundException());
@@ -58,6 +55,8 @@ public class GameSocketController {
         if (game.getStatus() == GameStatus.STARTED) {
             return Mono.error(new GameInProgressException());
         }
+
+        String username = packet.getUsername();
 
         boolean usernameExists = game.getPlayers()
             .stream()
@@ -69,7 +68,7 @@ public class GameSocketController {
 
         int defaultLives = game.getGameOptions().getLivesPerPlayer();
 
-        Player player = new Player(username);
+        Player player = new Player(username, packet.getPlayerUid());
         player.setBigHeadOptions(packet.getBigHeadOptions());
         player.setConnection(connection);
         player.setLives(defaultLives);
@@ -83,6 +82,10 @@ public class GameSocketController {
         SocketUtils.handleDisconnect(connection, () -> {
             // When the player disconnects, set their state to false.
             player.setState(PlayerState.DISCONNECTED);
+            // System.out.println("Player disconnected");
+            // System.out.println("Player username: " + player.getUsername());
+            // System.out.println("Player accumulated xp: " + player.getXp());
+            // System.out.println("Player User UID: " + playerUid);
 
             // Inform clients that the player is inactive.
             SocketUtils.sendPacket(game, "player-quit",

@@ -17,7 +17,7 @@ public class ReactiveUserDetailsServiceImpl implements ReactiveUserDetailsServic
 
     @Override
     public Mono<UserDetails> findByUsername(String email) {
-        return userRepository.findById(email)
+        return userRepository.findByEmail(email)
             .map((user) -> new UserDetailsImpl(user.getUid(), user.getEmail(),
                 user.getHashedPassword()));
     }

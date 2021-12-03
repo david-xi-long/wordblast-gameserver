@@ -24,7 +24,7 @@ public class UserService {
      * @return the registered user, if successful.
      */
     public CompletableFuture<User> registerUser(UserDto userDto) {
-        return userRepository.findById(userDto.getEmail())
+        return userRepository.findByEmail(userDto.getEmail())
             .toFuture()
             .thenCompose((userFound) -> {
                 if (userFound != null) {
@@ -47,15 +47,14 @@ public class UserService {
      * @return the updated user, if successful.
      */
     public CompletableFuture<User> updateUser(Player player) {
-        return userRepository.findById(player.getEmail())
+        return userRepository.findByIdAsString(player.getUid().toString())
             .toFuture()
             .thenCompose((userFound) -> {
-                if (userFound == null) {
-                    return CompletableFuture.failedFuture(new UserDoesNotExistException());
-                }
-
+                // Update WPM, level, total words, total games played, and experience
                 userFound.setGamesPlayed(userFound.getGamesPlayed() + 1);
-
+                userFound.setTotalWords(userFound.getTotalWords() + player.getUsedWords().size());
+                userFound.addExperience(player.getXp());
+                
                 return userRepository.save(userFound)
                     .toFuture();
             });

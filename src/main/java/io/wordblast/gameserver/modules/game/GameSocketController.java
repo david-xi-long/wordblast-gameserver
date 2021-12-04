@@ -46,7 +46,7 @@ public class GameSocketController {
      */
     @MessageMapping("join-game")
     public Mono<PacketOutGameInfo> joinGame(PacketInGameJoin packet, RSocketRequester connection) {
-        Game game = GameManager.getGame(packet.getGameUid());
+        Game game = GameManager.getGameFromUid(packet.getGameUid());
 
         if (game == null) {
             return Mono.error(new GameNotFoundException());
@@ -127,7 +127,7 @@ public class GameSocketController {
     public Mono<Void> fireAndForget(@Payload PacketInPlayerMessage packet) {
         PacketOutPlayerMessage message = new PacketOutPlayerMessage(packet.getGameUid(),
             packet.getUsername(), packet.getMessage());
-        Game game = GameManager.getGame(packet.getGameUid());
+        Game game = GameManager.getGameFromUid(packet.getGameUid());
         SocketUtils.sendPacket(game, "chat-message", message);
         return Mono.empty();
     }
@@ -142,7 +142,7 @@ public class GameSocketController {
     public Mono<Void> fireAndForget2(@Payload PacketInPlayerMessage packet) {
         PacketOutPlayerMessage message = new PacketOutPlayerMessage(packet.getGameUid(),
             packet.getUsername(), packet.getMessage());
-        Game game = GameManager.getGame(packet.getGameUid());
+        Game game = GameManager.getGameFromUid(packet.getGameUid());
         SocketUtils.sendPacket(game, "update-word", message);
         return Mono.empty();
     }
@@ -158,7 +158,7 @@ public class GameSocketController {
         UUID gameUid = packet.getGameUid();
         String username = packet.getUsername();
 
-        Game game = GameManager.getGame(gameUid);
+        Game game = GameManager.getGameFromUid(gameUid);
 
         if (game == null) {
             return Mono.error(new GameNotFoundException());
@@ -198,7 +198,7 @@ public class GameSocketController {
         String guess = packet.getWord();
         UUID gameUid = packet.getGameUid();
 
-        Game game = GameManager.getGame(gameUid);
+        Game game = GameManager.getGameFromUid(gameUid);
 
         return game.getController()
             .checkEndTurn(guess)
@@ -217,7 +217,7 @@ public class GameSocketController {
         String oldUsername = packet.getOldUsername();
         String newUsername = packet.getNewUsername();
 
-        Game game = GameManager.getGame(gameUid);
+        Game game = GameManager.getGameFromUid(gameUid);
 
         if (game == null) {
             return Mono.error(new GameNotFoundException());
@@ -262,7 +262,7 @@ public class GameSocketController {
     @MessageMapping("start-game")
     public Mono<Void> startGame(@Payload PacketInStartGame packet) {
         UUID gameUid = packet.getGameUid();
-        Game game = GameManager.getGame(gameUid);
+        Game game = GameManager.getGameFromUid(gameUid);
         String[] players = new String[game.getPlayers().size()];
         for (int i = 0; i < players.length; i++) {
             players[i] = game.getPlayers().get(i).getUsername();
@@ -296,7 +296,7 @@ public class GameSocketController {
         }
 
         UUID gameUid = statePacket.getGameUid();
-        Game game = GameManager.getGame(gameUid);
+        Game game = GameManager.getGameFromUid(gameUid);
         String username = statePacket.getUsername();
 
         Player player = game.getPlayers()
@@ -337,7 +337,7 @@ public class GameSocketController {
         String setting = packet.getSetting();
         String value = packet.getValue();
 
-        Game game = GameManager.getGame(gameUid);
+        Game game = GameManager.getGameFromUid(gameUid);
         GameOptions options = game.getGameOptions();
 
         // If available, modify the setting.

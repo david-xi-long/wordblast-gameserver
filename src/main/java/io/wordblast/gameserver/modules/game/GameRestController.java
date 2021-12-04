@@ -62,12 +62,19 @@ public class GameRestController {
     /**
      * This endpoint will attempt to return the requested game.
      * 
-     * @param gameUid the unique identifier of the requested game.
+     * @param gameId either the unique identifier or short identifier of the requested game.
      * @return the retrieved game.
      */
-    @GetMapping("/api/game/{gameUid}")
-    public ResponseEntity<Game> getGame(@PathVariable UUID gameUid) {
-        Game game = GameManager.getGame(gameUid);
+    @GetMapping("/api/game/{gameId}")
+    public ResponseEntity<Game> getGame(@PathVariable String gameId) {
+        Game game;
+
+        try {
+            game = GameManager.getGameFromUid(UUID.fromString(gameId));
+        } catch (Exception e) {
+            game = GameManager.getGameFromSid(gameId);
+        }
+
         return new ResponseEntity<>(game, game != null ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 

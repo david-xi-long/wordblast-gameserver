@@ -1,6 +1,7 @@
 package io.wordblast.gameserver.modules.game;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import io.wordblast.gameserver.modules.word.WordUtils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -19,6 +20,7 @@ public class Game {
     private final GameController controller = new GameController(this);
 
     private final UUID uid;
+    private final String sid;
     private final List<Player> players = new ArrayList<>();
     private final Set<Player> alivePlayers = new HashSet<>();
 
@@ -38,7 +40,7 @@ public class Game {
      * Create a new Game instance.
      */
     public Game() {
-        this(UUID.randomUUID());
+        this(UUID.randomUUID(), WordUtils.generateRandomString(6));
         this.usedWords = new HashSet<>();
         this.usedLetterCombinations = new HashSet<>();
     }
@@ -48,8 +50,9 @@ public class Game {
      * 
      * @param uid the unique identifier of the game.
      */
-    public Game(final UUID uid) {
+    public Game(final UUID uid, final String sid) {
         this.uid = uid;
+        this.sid = sid;
         this.status = GameStatus.WAITING;
         this.usedWords = new HashSet<>();
 
@@ -61,6 +64,10 @@ public class Game {
 
     public UUID getUid() {
         return uid;
+    }
+
+    public String getSid() {
+        return sid;
     }
 
     public GameStatus getStatus() {

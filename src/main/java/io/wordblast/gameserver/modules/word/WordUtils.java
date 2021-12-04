@@ -16,6 +16,9 @@ import reactor.core.publisher.Mono;
 public final class WordUtils {
     private static final WebClient CLIENT =
         WebClient.create("https://api.dictionaryapi.dev/api/v2/entries");
+    private static final char[] LOWERCASE_ALPHABET =
+        {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q',
+            'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
 
     /**
      * Class cannot be instantiated.
@@ -53,6 +56,23 @@ public final class WordUtils {
                     definition.getDefinition());
             })
             .map((info) -> Optional.of(info));
+    }
+
+    /**
+     * Generates a string of the specified length with random lowercase alphabetic characters.
+     * 
+     * @param length the length of the generated string.
+     * @return the generated string.
+     */
+    public static String generateRandomString(int length) {
+        char[] generatedChars = new char[length];
+
+        for (int i = 0; i < length; i++) {
+            int index = (int) Math.floor(Math.random() * LOWERCASE_ALPHABET.length);
+            generatedChars[i] = LOWERCASE_ALPHABET[index];
+        }
+
+        return new String(generatedChars);
     }
 
     /**

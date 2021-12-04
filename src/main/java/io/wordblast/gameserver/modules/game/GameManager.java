@@ -45,8 +45,22 @@ public final class GameManager {
      * @param gameUid the unique identifier of the game to search for.
      * @return the retrieved game if found, otherwise {@code null}.
      */
-    public static Game getGame(final UUID gameUid) {
+    public static Game getGameFromUid(final UUID gameUid) {
         return GAMES.get(gameUid);
+    }
+
+    /**
+     * Searches for the game with the associated short identifier.
+     * 
+     * @param gameSid the short identifier of the game to search for.
+     * @return the retrieved game if found, otherwise {@code null}.
+     */
+    public static Game getGameFromSid(final String gameSid) {
+        return GAMES.values()
+            .stream()
+            .filter((game) -> game.getSid().equals(gameSid))
+            .findFirst()
+            .orElse(null);
     }
 
     /**

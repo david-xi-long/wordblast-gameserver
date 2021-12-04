@@ -77,7 +77,7 @@ public final class PacketUtils {
      */
     public static Exception validateGame(GamePacket packet) {
         UUID gameUid = packet.getGameUid();
-        Game game = GameManager.getGame(gameUid);
+        Game game = GameManager.getGameFromUid(gameUid);
         return game != null ? null : new GameNotFoundException();
     }
 
@@ -95,7 +95,7 @@ public final class PacketUtils {
     public static <T extends GamePacket & PlayerPacket> Exception validatePlayer(T packet) {
         UUID gameUid = packet.getGameUid();
         String username = packet.getUsername();
-        Game game = GameManager.getGame(gameUid);
+        Game game = GameManager.getGameFromUid(gameUid);
         boolean playerExists = game.getPlayers()
             .stream()
             .anyMatch((p) -> p.getUsername().endsWith(username));

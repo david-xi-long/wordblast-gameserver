@@ -3,6 +3,7 @@ package io.wordblast.gameserver.modules.game;
 import io.wordblast.gameserver.ApplicationContextUtils;
 import io.wordblast.gameserver.modules.authentication.UserService;
 import io.wordblast.gameserver.modules.game.packets.PacketOutDefinition;
+import io.wordblast.gameserver.modules.game.packets.PacketOutExperienceChange;
 import io.wordblast.gameserver.modules.game.packets.PacketOutGameEnd;
 import io.wordblast.gameserver.modules.game.packets.PacketOutLivesChange;
 import io.wordblast.gameserver.modules.game.packets.PacketOutPlayerEliminated;
@@ -24,7 +25,7 @@ import reactor.core.publisher.Mono;
  */
 public class GameController {
     private final Game game;
-    
+
     public GameController(Game game) {
         this.game = game;
     }
@@ -167,6 +168,7 @@ public class GameController {
         Set<String> usedWords = game.getWords();
         String lowerCaseGuess = guess.toLowerCase();
         String combo = game.getCurrentLetterCombo().toLowerCase();
+
         if (usedWords.contains(guess)
             || !lowerCaseGuess.contains(combo)
             || !WordManager.getParsedWords().containsKey(lowerCaseGuess)) {
@@ -178,6 +180,10 @@ public class GameController {
         Player currentPlayer = game.getCurrentPlayer();
         currentPlayer.addWord(guess);
         currentPlayer.incrementXp(lowerCaseGuess.length());
+
+        SocketUtils.sendPacket(game, "experience-change",
+            new PacketOutExperienceChange(currentPlayer.getUsername(), lowerCaseGuess.length()));
+
         Set<Character> usedChars = currentPlayer.getUsedChars();
         Set<Character> unusedChars = currentPlayer.getUnusedChars();
         Set<Character> newlyUsedChars = currentPlayer.getNewlyUsedChars();
@@ -186,6 +192,7 @@ public class GameController {
 
         for (int i = 0; i < guess.length(); i++) {
             char curChar = guess.charAt(i);
+
             if (unusedChars.contains(curChar)) {
                 unusedChars.remove(curChar);
                 usedChars.add(curChar);
@@ -292,8 +299,8 @@ public class GameController {
             .stream()
             .forEach((player) -> {
                 ApplicationContext appCtx = ApplicationContextUtils.getApplicationContext();
-                //UserUtils utils = appCtx.getBean("userUtils", UserUtils.class);
-                //utils.updateUser(player);
+                // UserUtils utils = appCtx.getBean("userUtils", UserUtils.class);
+                // utils.updateUser(player);
                 UserService userService = appCtx.getBean("userService", UserService.class);
                 userService.updateUser(player);
             });

@@ -10,6 +10,7 @@ public class PlayerInfo {
     private final Map<String, Object> bigHeadOptions;
     private final boolean ready;
     private final int lives;
+    private final int experience;
 
     /**
      * Creates a new PlayerInfo instance.
@@ -18,13 +19,15 @@ public class PlayerInfo {
      * @param bigHeadOptions the big head options of the player.
      * @param ready the ready state of the player.
      * @param lives the remaining lives of the player.
+     * @param experience the experience of the player.
      */
     public PlayerInfo(String username, Map<String, Object> bigHeadOptions, boolean ready,
-        int lives) {
+        int lives, int experience) {
         this.username = username;
         this.bigHeadOptions = bigHeadOptions;
         this.ready = ready;
         this.lives = lives;
+        this.experience = experience;
     }
 
     public String getUsername() {
@@ -43,8 +46,12 @@ public class PlayerInfo {
         return lives;
     }
 
+    public int getExperience() {
+        return experience;
+    }
+
     public static PlayerInfo of(Player player) {
         return new PlayerInfo(player.getUsername(), player.getBigHeadOptions(), player.isReady(),
-            player.getLives());
+            player.getLives(), player.getXp());
     }
 }

@@ -180,7 +180,7 @@ public class GameController {
         Player currentPlayer = game.getCurrentPlayer();
         currentPlayer.addTimeElapsed((int) (game.getCountdown().getTimeElapsed() / 1000));
         currentPlayer.addWord(guess);
-        currentPlayer.incrementXp(lowerCaseGuess.length());
+        currentPlayer.incrementExperience(lowerCaseGuess.length());
 
         SocketUtils.sendPacket(game, "experience-change",
             new PacketOutExperienceChange(currentPlayer.getUsername(), lowerCaseGuess.length()));
@@ -297,14 +297,16 @@ public class GameController {
      */
     public void endGame() {
         SocketUtils.sendPacket(game, "game-end", new PacketOutGameEnd());
+
+        ApplicationContext appCtx = ApplicationContextUtils.getApplicationContext();
+        UserService userService = appCtx.getBean("userService", UserService.class);
+
         game.getPlayers()
             .stream()
             .forEach((player) -> {
-                ApplicationContext appCtx = ApplicationContextUtils.getApplicationContext();
-                // UserUtils utils = appCtx.getBean("userUtils", UserUtils.class);
-                // utils.updateUser(player);
-                UserService userService = appCtx.getBean("userService", UserService.class);
-                userService.updateUser(player);
+                if (player.isAuthenticated()) {
+                    userService.updateUser(player);
+                }
             });
     }
 }

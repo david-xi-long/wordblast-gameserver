@@ -1,5 +1,7 @@
 package io.wordblast.gameserver.modules.game;
 
+import io.wordblast.gameserver.modules.authentication.User;
+import io.wordblast.gameserver.modules.authentication.UserService;
 import io.wordblast.gameserver.modules.game.packets.PacketInCheckWord;
 import io.wordblast.gameserver.modules.game.packets.PacketInGameJoin;
 import io.wordblast.gameserver.modules.game.packets.PacketInPlayerMessage;
@@ -26,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -38,6 +41,9 @@ import reactor.core.publisher.Mono;
  */
 @Controller
 public class GameSocketController {
+    @Autowired
+    UserService userService;
+
     /**
      * Handles incoming messages of the game join route.
      *
@@ -56,38 +62,49 @@ public class GameSocketController {
             return Mono.error(new GameInProgressException());
         }
 
-        String username = packet.getUsername();
-
         boolean usernameExists = game.getPlayers()
             .stream()
-            .anyMatch((p) -> p.getUsername().equalsIgnoreCase(username));
+            .anyMatch((p) -> p.getUsername().equalsIgnoreCase(packet.getUsername()));
 
         if (usernameExists) {
             return Mono.error(new UsernameTakenException());
         }
 
+        UUID userUid = packet.getUserUid();
+
+        if (userUid == null) {
+            return joinGame(packet, null, connection);
+        }
+
+        return userService.getUser(userUid)
+            .flatMap((user) -> joinGame(packet, user, connection));
+    }
+
+    private Mono<PacketOutGameInfo> joinGame(PacketInGameJoin packet, User user,
+        RSocketRequester connection) {
+
+        Game game = GameManager.getGameFromUid(packet.getGameUid());
+        String username = packet.getUsername();
         int defaultLives = game.getGameOptions().getLivesPerPlayer();
 
         Player player = new Player(username, packet.getUserUid());
-        player.setBigHeadOptions(packet.getBigHeadOptions());
+
         player.setConnection(connection);
+        player.setExperience(user == null ? 0 : user.getExperience());
+        player.setBigHeadOptions(packet.getBigHeadOptions());
         player.setLives(defaultLives);
 
         game.addPlayer(player);
 
-        // Inform clients that the player is active.
+        // Inform clients that the player joined.
         SocketUtils.sendPacket(game, "player-join",
             new PacketOutPlayerJoin(PlayerInfo.of(player)));
 
         SocketUtils.handleDisconnect(connection, () -> {
-            // When the player disconnects, set their state to false.
+            // When the player disconnects, set their state to disconnected.
             player.setState(PlayerState.DISCONNECTED);
-            // System.out.println("Player disconnected");
-            // System.out.println("Player username: " + player.getUsername());
-            // System.out.println("Player accumulated xp: " + player.getXp());
-            // System.out.println("Player User UID: " + playerUid);
 
-            // Inform clients that the player is inactive.
+            // Inform clients that the player quit.
             SocketUtils.sendPacket(game, "player-quit",
                 new PacketOutPlayerQuit(PlayerInfo.of(player)));
         });

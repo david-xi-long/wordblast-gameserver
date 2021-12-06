@@ -52,6 +52,6 @@ public class PlayerInfo {
 
     public static PlayerInfo of(Player player) {
         return new PlayerInfo(player.getUsername(), player.getBigHeadOptions(), player.isReady(),
-            player.getLives(), player.getXp());
+            player.getLives(), player.getExperience());
     }
 }

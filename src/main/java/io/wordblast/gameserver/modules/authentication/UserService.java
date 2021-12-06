@@ -7,6 +7,7 @@ import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 /**
  * The implementation of the user service.
@@ -40,26 +41,40 @@ public class UserService {
                     .toFuture();
             });
     }
-    
+
+    /**
+     * Atempts to retrieve the user from with the given unique identifier from the database.
+     * 
+     * @param userUid the unique identifier of the player to retrieve.
+     * @return the retrieved user, if found. Otherwise, {@code null}.
+     */
+    public Mono<User> getUser(UUID userUid) {
+        return userRepository.findByIdAsString(userUid.toString());
+    }
+
     /**
      * Attempts to update a user.
      * 
-     * @param Player the player in a game to update.
+     * @param player the player in a game to update.
      * @return the updated user, if successful.
      */
     public CompletableFuture<User> updateUser(Player player) {
         return userRepository.findByIdAsString(player.getUid().toString())
             .toFuture()
-            .thenCompose((userFound) -> {         
-                userFound.setGamesPlayed(userFound.getGamesPlayed() + 1);
-                userFound.setTotalWords(userFound.getTotalWords() + player.getUsedWords().size());
-                userFound.addExperience(player.getXp());
-                userFound.setTotalTimeElapsed(userFound.getTotalTimeElapsed() + player.getTimeElapsed());
-                userFound.setWPM(userFound.getTotalWords() * 60 / (userFound.getTotalTimeElapsed()));
+            .thenCompose((user) -> {
+                if (user == null) {
+                    return CompletableFuture.completedStage(null);
+                }
+
+                user.setGamesPlayed(user.getGamesPlayed() + 1);
+                user.setTotalWords(user.getTotalWords() + player.getUsedWords().size());
+                user.addExperience(player.getExperience());
+                user.setTotalTimeElapsed(user.getTotalTimeElapsed() + player.getTimeElapsed());
+                user.setWPM(user.getTotalWords() * 60 / (user.getTotalTimeElapsed()));
 
                 // Update most used words and level?
 
-                return userRepository.save(userFound)
+                return userRepository.save(user)
                     .toFuture();
             });
     }

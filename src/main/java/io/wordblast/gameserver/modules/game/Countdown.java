@@ -77,4 +77,11 @@ public class Countdown {
         LocalDateTime reference = stopDate == null ? LocalDateTime.now() : stopDate;
         return endDate != null ? reference.until(endDate, ChronoUnit.MILLIS) : -1;
     }
+
+    /*
+     * Returns the original length.
+     */
+    public int getLength() {
+        return length;
+    }
 }

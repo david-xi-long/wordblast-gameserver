@@ -66,10 +66,13 @@ public class UserService {
                     return CompletableFuture.completedStage(null);
                 }
 
-                // Update WPM, level, total words, total games played, and experience
                 user.setGamesPlayed(user.getGamesPlayed() + 1);
                 user.setTotalWords(user.getTotalWords() + player.getUsedWords().size());
                 user.addExperience(player.getExperience());
+                user.setTotalTimeElapsed(user.getTotalTimeElapsed() + player.getTimeElapsed());
+                user.setWPM(user.getTotalWords() * 60 / (user.getTotalTimeElapsed()));
+
+                // Update most used words and level?
 
                 return userRepository.save(user)
                     .toFuture();

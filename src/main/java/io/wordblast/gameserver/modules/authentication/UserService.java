@@ -2,6 +2,7 @@ package io.wordblast.gameserver.modules.authentication;
 
 import io.wordblast.gameserver.modules.database.UserRepository;
 import io.wordblast.gameserver.modules.game.Player;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -61,5 +62,20 @@ public class UserService {
                 return userRepository.save(userFound)
                     .toFuture();
             });
+    }
+
+    /**
+     * Attempts to search for a user in the repository
+     * 
+     * @param uid the uid of the user
+     * @return the user, if successful
+     */
+
+    public CompletableFuture<User> findUser(UUID uid) {
+        return userRepository.findByIdAsString(uid.toString()).toFuture();
+    }
+
+    public CompletableFuture<User> findUser(String email) {
+        return userRepository.findByEmail(email).toFuture();
     }
 }

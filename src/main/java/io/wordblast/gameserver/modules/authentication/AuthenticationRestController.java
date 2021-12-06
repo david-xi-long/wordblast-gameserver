@@ -1,5 +1,6 @@
 package io.wordblast.gameserver.modules.authentication;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,20 @@ public class AuthenticationRestController {
         return CompletableFuture.completedFuture(
             String.format("{\"authenticated\": %b, \"uid\": \"%s\"}", user != null,
                 user != null ? user.getUid() : null));
+    }
+
+    /**
+     * Endpoint to retrieve statistics of the player
+     * @return the logged in user account.
+     */
+    @PostMapping("/api/user/statistics")
+    public CompletableFuture<String> getUserStatistics(@Valid StatisticDto statisticDto) {
+        System.out.println(statisticDto.getUid());
+        return userService.findUser(UUID.fromString(statisticDto.getUid()))
+            .thenApply((foundUser) -> String.format("{\"GamesPlayed\": \"%s\",", foundUser.getGamesPlayed())
+             + String.format("\"Experience\": \"%s\",", foundUser.getExperience())
+             + String.format("\"WPM\": \"%s\",", foundUser.getWPM())
+             + String.format("\"TotalWords\": \"%s\"}", foundUser.getGamesPlayed()));
     }
 
     /**

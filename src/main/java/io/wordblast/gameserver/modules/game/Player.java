@@ -161,7 +161,7 @@ public class Player {
         return timeElapsed;
     }
 
-    public void setTimeElapsed(int timeElapsed) {
+    public void addTimeElapsed(int timeElapsed) {
         this.timeElapsed = timeElapsed;
     }
 }

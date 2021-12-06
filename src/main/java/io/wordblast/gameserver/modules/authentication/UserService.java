@@ -49,12 +49,15 @@ public class UserService {
     public CompletableFuture<User> updateUser(Player player) {
         return userRepository.findByIdAsString(player.getUid().toString())
             .toFuture()
-            .thenCompose((userFound) -> {
-                // Update WPM, level, total words, total games played, and experience
+            .thenCompose((userFound) -> {         
                 userFound.setGamesPlayed(userFound.getGamesPlayed() + 1);
                 userFound.setTotalWords(userFound.getTotalWords() + player.getUsedWords().size());
                 userFound.addExperience(player.getXp());
-                
+                userFound.setTotalTimeElapsed(userFound.getTotalTimeElapsed() + player.getTimeElapsed());
+                userFound.setWPM(userFound.getTotalWords() * 60 / (userFound.getTotalTimeElapsed()));
+
+                // Update most used words and level?
+
                 return userRepository.save(userFound)
                     .toFuture();
             });

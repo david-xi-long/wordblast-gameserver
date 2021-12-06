@@ -178,6 +178,7 @@ public class GameController {
         usedWords.add(guess);
 
         Player currentPlayer = game.getCurrentPlayer();
+        currentPlayer.addTimeElapsed((int) (game.getCountdown().getTimeElapsed() / 1000));
         currentPlayer.addWord(guess);
         currentPlayer.incrementXp(lowerCaseGuess.length());
 
@@ -222,6 +223,7 @@ public class GameController {
 
         if (outOfTime) {
             currentPlayer.setLives(currentPlayer.getLives() - 1);
+            currentPlayer.addTimeElapsed(game.getCountdown().getLength());
 
             SocketUtils.sendPacket(game, "lives-change",
                 new PacketOutLivesChange(currentPlayer.getUsername(), currentPlayer.getLives()));

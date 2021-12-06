@@ -10,24 +10,25 @@ import org.springframework.messaging.rsocket.RSocketRequester;
  * Represents a player within a game.
  */
 public class Player {
-    // private final UUID uid = UUID.randomUUID();
     private final UUID uid;
+    private final boolean authenticated;
+
+    private int experience;
 
     private String username;
     private Map<String, Object> bigHeadOptions;
     private boolean ready;
     private PlayerState state;
     private int lives;
-    private int score;
-    private int xp;
-    private boolean authenticated;
-    private RSocketRequester connection;
+
     private Set<Character> usedChars = new LinkedHashSet<>();
     private Set<Character> unusedChars = new LinkedHashSet<>();
     private Set<Character> newlyUsedChars = new LinkedHashSet<>();
     private Set<String> usedWords = new LinkedHashSet<>();
     private String email;
     private int timeElapsed;
+
+    private RSocketRequester connection;
 
     /**
      * Creates a new Player object.
@@ -37,17 +38,24 @@ public class Player {
     public Player(String username, UUID uid) {
         this.username = username;
         this.state = PlayerState.ACTIVE;
+
         if (uid != null) {
             this.uid = uid;
-
+            this.authenticated = true;
         } else {
             this.uid = UUID.randomUUID();
+            this.authenticated = false;
         }
+
         resetChars();
     }
 
     public UUID getUid() {
         return uid;
+    }
+
+    public boolean isAuthenticated() {
+        return authenticated;
     }
 
     public String getUsername() {
@@ -90,18 +98,6 @@ public class Player {
         this.lives = lives;
     }
 
-    public int getScore() {
-        return score;
-    }
-
-    public void setScore(int score) {
-        this.score = score;
-    }
-
-    public boolean isAuthenticated() {
-        return authenticated;
-    }
-
     public RSocketRequester getConnection() {
         return connection;
     }
@@ -129,12 +125,16 @@ public class Player {
         }
     }
 
-    public void incrementXp(int xp) {
-        this.xp += xp;
+    public void setExperience(int experience) {
+        this.experience = experience;
     }
 
-    public int getXp() {
-        return xp;
+    public void incrementExperience(int experience) {
+        this.experience += experience;
+    }
+
+    public int getExperience() {
+        return experience;
     }
 
     public Set<Character> getNewlyUsedChars() {

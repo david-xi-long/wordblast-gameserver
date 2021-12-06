@@ -2,10 +2,12 @@ package io.wordblast.gameserver.modules.authentication;
 
 import io.wordblast.gameserver.modules.database.UserRepository;
 import io.wordblast.gameserver.modules.game.Player;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 /**
  * The implementation of the user service.
@@ -39,23 +41,37 @@ public class UserService {
                     .toFuture();
             });
     }
-    
+
+    /**
+     * Atempts to retrieve the user from with the given unique identifier from the database.
+     * 
+     * @param userUid the unique identifier of the player to retrieve.
+     * @return the retrieved user, if found. Otherwise, {@code null}.
+     */
+    public Mono<User> getUser(UUID userUid) {
+        return userRepository.findByIdAsString(userUid.toString());
+    }
+
     /**
      * Attempts to update a user.
      * 
-     * @param Player the player in a game to update.
+     * @param player the player in a game to update.
      * @return the updated user, if successful.
      */
     public CompletableFuture<User> updateUser(Player player) {
         return userRepository.findByIdAsString(player.getUid().toString())
             .toFuture()
-            .thenCompose((userFound) -> {
+            .thenCompose((user) -> {
+                if (user == null) {
+                    return CompletableFuture.completedStage(null);
+                }
+
                 // Update WPM, level, total words, total games played, and experience
-                userFound.setGamesPlayed(userFound.getGamesPlayed() + 1);
-                userFound.setTotalWords(userFound.getTotalWords() + player.getUsedWords().size());
-                userFound.addExperience(player.getXp());
-                
-                return userRepository.save(userFound)
+                user.setGamesPlayed(user.getGamesPlayed() + 1);
+                user.setTotalWords(user.getTotalWords() + player.getUsedWords().size());
+                user.addExperience(player.getExperience());
+
+                return userRepository.save(user)
                     .toFuture();
             });
     }

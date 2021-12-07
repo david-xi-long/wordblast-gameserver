@@ -24,6 +24,8 @@ import reactor.core.publisher.Mono;
  * The class which controls the logic of a game.
  */
 public class GameController {
+    private final WordController wordController = new WordController();
+
     private final Game game;
 
     public GameController(Game game) {
@@ -74,6 +76,10 @@ public class GameController {
         game.setStatus(GameStatus.STARTED);
         game.setPreviousOutOfTime(false);
 
+        Set<String> customWords = game.getGameOptions().getCustomWords();
+
+        wordController.setWords(customWords);
+
         // Start the first round.
         nextRound();
     }
@@ -83,7 +89,16 @@ public class GameController {
      */
     public void nextRound() {
         game.setCurrentRound(game.getCurrentRound() + 1);
-        game.setCurrentLetterCombo(WordUtils.getCombination());
+
+        String combo;
+
+        if (game.getGameOptions().getCustomWords().size() > 0) {
+            combo = wordController.getRandomCombo();
+        } else {
+            combo = WordUtils.getCombination();
+        }
+
+        game.setCurrentLetterCombo(combo);
 
         // Start the first player's turn.
         nextTurn();
@@ -167,19 +182,24 @@ public class GameController {
     public Mono<Optional<WordInfo>> checkEndTurn(String guess) {
         Set<String> usedWords = game.getWords();
         String lowerCaseGuess = guess.toLowerCase();
-        String combo = game.getCurrentLetterCombo().toLowerCase();
+        String lowerCaseCombo = game.getCurrentLetterCombo().toLowerCase();
 
-        if (usedWords.contains(guess)
-            || !lowerCaseGuess.contains(combo)
-            || !WordManager.getParsedWords().containsKey(lowerCaseGuess)) {
+        boolean wordIsUsed = usedWords.contains(lowerCaseGuess);
+        boolean wordContainsCombo = lowerCaseGuess.contains(lowerCaseCombo);
+        boolean isValidWord =
+            game.getGameOptions().getCustomWords().size() > 0
+                ? wordController.isWord(lowerCaseGuess)
+                : WordManager.isWord(lowerCaseGuess);
+
+        if (wordIsUsed || !wordContainsCombo || !isValidWord) {
             return Mono.just(Optional.empty());
         }
 
-        usedWords.add(guess);
+        usedWords.add(lowerCaseGuess);
 
         Player currentPlayer = game.getCurrentPlayer();
         currentPlayer.addTimeElapsed((int) (game.getCountdown().getTimeElapsed() / 1000));
-        currentPlayer.addWord(guess);
+        currentPlayer.addWord(lowerCaseGuess);
         currentPlayer.incrementExperience(lowerCaseGuess.length());
 
         SocketUtils.sendPacket(game, "experience-change",
@@ -191,8 +211,8 @@ public class GameController {
 
         newlyUsedChars.clear();
 
-        for (int i = 0; i < guess.length(); i++) {
-            char curChar = guess.charAt(i);
+        for (int i = 0; i < lowerCaseGuess.length(); i++) {
+            char curChar = lowerCaseGuess.charAt(i);
 
             if (unusedChars.contains(curChar)) {
                 unusedChars.remove(curChar);
@@ -208,11 +228,11 @@ public class GameController {
 
         endTurn(false);
 
-        WordUtils.getWordInfo(guess)
+        WordUtils.getWordInfo(lowerCaseGuess)
             .subscribe(value -> SocketUtils.sendPacket(game, "definition",
                 new PacketOutDefinition(value.get().getWord(), value.get().getDefinition())));
 
-        return WordUtils.getWordInfo(guess);
+        return WordUtils.getWordInfo(lowerCaseGuess);
     }
 
     /**

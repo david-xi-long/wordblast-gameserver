@@ -1,5 +1,7 @@
 package io.wordblast.gameserver.modules.game;
 
+import java.util.Set;
+
 /**
  * The settings of the game lobby.
  */
@@ -11,6 +13,7 @@ public class GameOptions {
     private int decrementTimePerRound;
     private boolean earnExtraLives;
     private boolean increaseDifficulty;
+    private Set<String> customWords;
 
     /**
      * Creates a new game options object with the default values.
@@ -30,6 +33,7 @@ public class GameOptions {
         this.decrementTimePerRound = builder.getDecrementTimePerRound();
         this.earnExtraLives = builder.isEarnExtraLives();
         this.increaseDifficulty = builder.isIncreaseDifficulty();
+        this.customWords = builder.getCustomWords();
     }
 
     public void setVisibility(GameVisibility visibility) {
@@ -86,5 +90,13 @@ public class GameOptions {
 
     public boolean increasesDifficulty() {
         return increaseDifficulty;
+    }
+
+    public void setCustomWords(Set<String> customWords) {
+        this.customWords = customWords;
+    }
+
+    public Set<String> getCustomWords() {
+        return customWords;
     }
 }

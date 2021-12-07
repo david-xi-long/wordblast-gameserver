@@ -1,5 +1,8 @@
 package io.wordblast.gameserver.modules.game;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * A builder class for {@link io.wordblast.gameserver.modules.game.GameOptions GameOptions}.
  */
@@ -12,6 +15,7 @@ public final class GameOptionsBuilder {
     private int decrementTimePerRound = 1;
     private boolean earnExtraLives = true;
     private boolean increaseDifficulty = true;
+    private Set<String> customWords = new HashSet<>();
 
     public GameOptionsBuilder maxPlayers(final int maxPlayers) {
         if (maxPlayers < 0) {
@@ -89,6 +93,18 @@ public final class GameOptionsBuilder {
 
     public boolean isIncreaseDifficulty() {
         return increaseDifficulty;
+    }
+
+    public GameOptionsBuilder customWords(final Set<String> customWords) {
+        if (customWords == null) {
+            return this;
+        }
+        this.customWords = customWords;
+        return this;
+    }
+
+    public Set<String> getCustomWords() {
+        return customWords;
     }
 }
 // CHECKSTYLE.ON: MissingJavadocMethodCheck

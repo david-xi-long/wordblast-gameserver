@@ -47,4 +47,8 @@ public final class WordManager {
     public static Map<Integer, Map<String, Integer>> getParsedCombinations() {
         return parsedCombinations;
     }
+
+    public static boolean isWord(String word) {
+        return parsedWords.containsKey(word);
+    }
 }

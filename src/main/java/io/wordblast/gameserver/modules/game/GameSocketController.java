@@ -118,6 +118,7 @@ public class GameSocketController {
         settings.put("timePerPlayer", String.valueOf(options.getTimePerPlayer()));
         settings.put("extraLives", String.valueOf(options.earnsExtraLives()));
         settings.put("increasingDifficulty", String.valueOf(options.increasesDifficulty()));
+        settings.put("customWords", String.join(", ", options.getCustomWords()));
 
         Set<PlayerInfo> activePlayerInfos = game.getPlayers()
             .stream()
@@ -384,6 +385,14 @@ public class GameSocketController {
                 break;
             case "increasingDifficulty":
                 options.setIncreaseDifficulty(Boolean.valueOf(value));
+                break;
+            case "customWords":
+                Set<String> words = Set.of(value.split(","))
+                    .stream()
+                    .map((word) -> word.trim())
+                    .filter((word) -> word.length() > 0)
+                    .collect(Collectors.toSet());
+                options.setCustomWords(words);
                 break;
             default:
                 return Mono.error(new GameSettingNotFoundException());

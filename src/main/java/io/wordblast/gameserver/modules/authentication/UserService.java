@@ -68,14 +68,31 @@ public class UserService {
 
                 user.setGamesPlayed(user.getGamesPlayed() + 1);
                 user.setTotalWords(user.getTotalWords() + player.getUsedWords().size());
-                user.addExperience(player.getExperience());
+                user.setExperience(player.getExperience());
                 user.setTotalTimeElapsed(user.getTotalTimeElapsed() + player.getTimeElapsed());
                 user.setWPM(user.getTotalWords() * 60 / (user.getTotalTimeElapsed()));
+                user.setLevel((int) Math.floor(Math.pow((user.getExperience() / 250), 0.8)));
+                user.setAverageWordLength(user.getExperience() / user.getTotalWords());
 
                 // Update most used words and level?
 
                 return userRepository.save(user)
                     .toFuture();
             });
+    }
+
+    /**
+     * Attempts to search for a user in the repository.
+     * 
+     * @param uid the uid of the user
+     * @return the user, if successful
+     */
+
+    public CompletableFuture<User> findUser(UUID uid) {
+        return userRepository.findByIdAsString(uid.toString()).toFuture();
+    }
+
+    public CompletableFuture<User> findUser(String email) {
+        return userRepository.findByEmail(email).toFuture();
     }
 }

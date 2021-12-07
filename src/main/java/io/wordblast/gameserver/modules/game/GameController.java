@@ -162,7 +162,7 @@ public class GameController {
             .registerSingle(
                 taskName,
                 () -> {
-                    endTurn(true);
+                    endTurn(true, false);
                 },
                 turnLength,
                 TimeUnit.SECONDS);
@@ -221,12 +221,13 @@ public class GameController {
             }
         }
 
-        if (unusedChars.size() == 0) {
+        boolean usedAllChars = unusedChars.size() == 0;
+
+        if (usedAllChars) {
             currentPlayer.resetChars();
-            currentPlayer.setLives(currentPlayer.getLives() + 1);
         }
 
-        endTurn(false);
+        endTurn(false, usedAllChars);
 
         WordUtils.getWordInfo(lowerCaseGuess)
             .subscribe(value -> SocketUtils.sendPacket(game, "definition",
@@ -238,17 +239,23 @@ public class GameController {
     /**
      * Ends the current turn.
      */
-    public void endTurn(boolean outOfTime) {
+    public void endTurn(boolean outOfTime, boolean earnLife) {
         Player currentPlayer = game.getCurrentPlayer();
 
         if (outOfTime) {
             currentPlayer.setLives(currentPlayer.getLives() - 1);
             currentPlayer.addTimeElapsed(game.getCountdown().getLength());
 
+            checkElimination(currentPlayer);
+        }
+
+        if (earnLife) {
+            currentPlayer.setLives(currentPlayer.getLives() + 1);
+        }
+
+        if (outOfTime || earnLife) {
             SocketUtils.sendPacket(game, "lives-change",
                 new PacketOutLivesChange(currentPlayer.getUsername(), currentPlayer.getLives()));
-
-            checkElimination(currentPlayer);
         }
 
         game.setPreviousOutOfTime(outOfTime);

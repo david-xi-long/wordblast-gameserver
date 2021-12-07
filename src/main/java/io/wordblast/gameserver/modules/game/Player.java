@@ -120,7 +120,7 @@ public class Player {
     public void resetChars() {
         usedChars.clear();
         // newlyUsedChars.clear();
-        for (char c = 'A'; c <= 'Z'; c++) {
+        for (char c = 'a'; c <= 'z'; c++) {
             unusedChars.add(c);
         }
     }

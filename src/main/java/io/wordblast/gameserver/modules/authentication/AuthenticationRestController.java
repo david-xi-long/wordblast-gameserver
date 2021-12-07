@@ -3,6 +3,7 @@ package io.wordblast.gameserver.modules.authentication;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import javax.validation.Valid;
+import org.bson.json.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -56,7 +57,8 @@ public class AuthenticationRestController {
             .thenApply((foundUser) -> String.format("{\"GamesPlayed\": \"%s\",", foundUser.getGamesPlayed())
              + String.format("\"Experience\": \"%s\",", foundUser.getExperience())
              + String.format("\"WPM\": \"%s\",", foundUser.getWPM())
-             + String.format("\"TotalWords\": \"%s\"}", foundUser.getGamesPlayed()));
+             + String.format("\"TotalWords\": \"%s\",", foundUser.getGamesPlayed())
+             + String.format("\"Level\": \"%s\"}", foundUser.getLevel()));
     }
 
     /**

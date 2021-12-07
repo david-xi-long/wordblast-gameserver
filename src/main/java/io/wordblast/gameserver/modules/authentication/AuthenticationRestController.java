@@ -58,7 +58,8 @@ public class AuthenticationRestController {
              + String.format("\"Experience\": \"%s\",", foundUser.getExperience())
              + String.format("\"WPM\": \"%s\",", foundUser.getWPM())
              + String.format("\"TotalWords\": \"%s\",", foundUser.getGamesPlayed())
-             + String.format("\"Level\": \"%s\"}", foundUser.getLevel()));
+             + String.format("\"Level\": \"%s\",", foundUser.getLevel())
+             + String.format("\"AverageWordLength\": \"%s\"}", foundUser.getAverageWordLength()));
     }
 
     /**

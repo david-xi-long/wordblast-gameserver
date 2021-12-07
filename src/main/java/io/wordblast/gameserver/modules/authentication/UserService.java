@@ -72,6 +72,7 @@ public class UserService {
                 user.setTotalTimeElapsed(user.getTotalTimeElapsed() + player.getTimeElapsed());
                 user.setWPM(user.getTotalWords() * 60 / (user.getTotalTimeElapsed()));
                 user.setLevel((int) Math.floor(Math.pow((user.getExperience() / 250), 0.8)));
+                user.setAverageWordLength(user.getExperience() / user.getTotalWords());
 
                 // Update most used words and level?
 

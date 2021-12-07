@@ -20,6 +20,7 @@ public class User {
     private int totalTimeElapsed;
     private double WPM;
     private int level;
+    private int averageWordLength;
 
     /**
      * Creates a new user object with the default values.
@@ -46,6 +47,7 @@ public class User {
         this.WPM = 0;
         this.idAsString = uid.toString();
         this.level = 0;
+        this.averageWordLength = 0;
     }
 
     public void setUid(UUID uuid) {
@@ -126,6 +128,14 @@ public class User {
 
     public void setLevel(int level) {
         this.level = level;
+    }
+
+    public int getAverageWordLength() {
+        return this.averageWordLength;
+    }
+
+    public void setAverageWordLength(int averageWordLength) {
+        this.averageWordLength = averageWordLength;
     }
 
 }

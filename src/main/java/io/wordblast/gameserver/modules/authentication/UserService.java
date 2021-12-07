@@ -68,9 +68,10 @@ public class UserService {
 
                 user.setGamesPlayed(user.getGamesPlayed() + 1);
                 user.setTotalWords(user.getTotalWords() + player.getUsedWords().size());
-                user.addExperience(player.getExperience());
+                user.setExperience(player.getExperience());
                 user.setTotalTimeElapsed(user.getTotalTimeElapsed() + player.getTimeElapsed());
                 user.setWPM(user.getTotalWords() * 60 / (user.getTotalTimeElapsed()));
+                user.setLevel((int) Math.floor(Math.pow((user.getExperience() / 250), 0.8)));
 
                 // Update most used words and level?
 
@@ -80,7 +81,7 @@ public class UserService {
     }
 
     /**
-     * Attempts to search for a user in the repository
+     * Attempts to search for a user in the repository.
      * 
      * @param uid the uid of the user
      * @return the user, if successful

@@ -76,8 +76,8 @@ public class User {
         return experience;
     }
 
-    public void addExperience(int xp) {
-        this.experience += xp;
+    public void setExperience(int xp) {
+        this.experience = xp;
     }
 
     public int getGamesPlayed() {

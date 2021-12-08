@@ -27,7 +27,7 @@ public class MongoConfig extends AbstractReactiveMongoConfiguration {
      * The database connection string for the production environment.
      */
     private static final String CONNECTION_STRING_PROD =
-        "mongodb://%s:%s@34.145.177.221:27017/" + DATABASE_NAME;
+        "mongodb+srv://%s:%s@wordblast-cluster.lh0xy.mongodb.net/" + DATABASE_NAME;
 
     @Autowired
     EnvProperties envProperties;
@@ -43,7 +43,7 @@ public class MongoConfig extends AbstractReactiveMongoConfiguration {
     protected void configureClientSettings(Builder builder) {
         String env = envProperties.getEnv();
 
-        String connectionString = env.equals("DEV")
+        String connectionString = env.equals("development")
             ? CONNECTION_STRING_DEV
             : String.format(CONNECTION_STRING_PROD,
                 mongoProperties.getUsername(),

@@ -9,8 +9,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "mongodb")
 public class MongoProperties {
-    private final String username;
-    private final String password;
+    private String username;
+    private String password;
 
     public MongoProperties() {
         this(null, null);
@@ -25,7 +25,15 @@ public class MongoProperties {
         return username;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

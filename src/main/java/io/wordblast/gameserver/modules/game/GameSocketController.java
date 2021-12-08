@@ -117,7 +117,7 @@ public class GameSocketController {
         settings.put("playerLives", String.valueOf(options.getLivesPerPlayer()));
         settings.put("timePerPlayer", String.valueOf(options.getTimePerPlayer()));
         settings.put("extraLives", String.valueOf(options.earnsExtraLives()));
-        settings.put("increasingDifficulty", String.valueOf(options.increasesDifficulty()));
+        // settings.put("increasingDifficulty", String.valueOf(options.increasesDifficulty()));
         settings.put("customWords", String.join(", ", options.getCustomWords()));
 
         Set<PlayerInfo> activePlayerInfos = game.getPlayers()
@@ -383,9 +383,9 @@ public class GameSocketController {
             case "extraLives":
                 options.setEarnExtraLives(Boolean.valueOf(value));
                 break;
-            case "increasingDifficulty":
-                options.setIncreaseDifficulty(Boolean.valueOf(value));
-                break;
+            // case "increasingDifficulty":
+            // options.setIncreaseDifficulty(Boolean.valueOf(value));
+            // break;
             case "customWords":
                 Set<String> words = Set.of(value.split(","))
                     .stream()

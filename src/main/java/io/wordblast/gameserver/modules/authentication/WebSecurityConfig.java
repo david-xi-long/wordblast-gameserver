@@ -35,7 +35,7 @@ public class WebSecurityConfig {
 
         CorsConfiguration corsConfig = new CorsConfiguration();
         corsConfig.setAllowCredentials(true);
-        corsConfig.setAllowedOrigins(List.of("http://localhost:3000"));
+        corsConfig.setAllowedOrigins(List.of("http://localhost:3000", "http://34.145.177.221"));
         corsConfig.setAllowedMethods(List.of("GET", "POST"));
 
         UrlBasedCorsConfigurationSource source =

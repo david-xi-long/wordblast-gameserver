@@ -3,7 +3,6 @@ package io.wordblast.gameserver.modules.authentication;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import javax.validation.Valid;
-import org.bson.json.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -47,19 +46,22 @@ public class AuthenticationRestController {
     }
 
     /**
-     * Endpoint to retrieve statistics of the player
+     * Endpoint to retrieve statistics of the player.
+     * 
      * @return the logged in user account.
      */
     @PostMapping("/api/user/statistics")
     public CompletableFuture<String> getUserStatistics(@Valid StatisticDto statisticDto) {
         System.out.println(statisticDto.getUid());
         return userService.findUser(UUID.fromString(statisticDto.getUid()))
-            .thenApply((foundUser) -> String.format("{\"GamesPlayed\": \"%s\",", foundUser.getGamesPlayed())
-             + String.format("\"Experience\": \"%s\",", foundUser.getExperience())
-             + String.format("\"WPM\": \"%s\",", foundUser.getWPM())
-             + String.format("\"TotalWords\": \"%s\",", foundUser.getGamesPlayed())
-             + String.format("\"Level\": \"%s\",", foundUser.getLevel())
-             + String.format("\"AverageWordLength\": \"%s\"}", foundUser.getAverageWordLength()));
+            .thenApply((
+                foundUser) -> String.format("{\"GamesPlayed\": \"%s\",", foundUser.getGamesPlayed())
+                    + String.format("\"Experience\": \"%s\",", foundUser.getExperience())
+                    + String.format("\"WPM\": \"%s\",", foundUser.getWpm())
+                    + String.format("\"TotalWords\": \"%s\",", foundUser.getGamesPlayed())
+                    + String.format("\"Level\": \"%s\",", foundUser.getLevel())
+                    + String.format("\"AverageWordLength\": \"%s\"}",
+                        foundUser.getAverageWordLength()));
     }
 
     /**

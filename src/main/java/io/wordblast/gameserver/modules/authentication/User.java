@@ -18,7 +18,7 @@ public class User {
     private int gamesPlayed;
     private int totalWords;
     private int totalTimeElapsed;
-    private double WPM;
+    private double wpm;
     private int level;
     private int averageWordLength;
 
@@ -44,7 +44,7 @@ public class User {
         this.gamesPlayed = 0;
         this.totalWords = 0;
         this.totalTimeElapsed = 0;
-        this.WPM = 0;
+        this.wpm = 0;
         this.idAsString = uid.toString();
         this.level = 0;
         this.averageWordLength = 0;
@@ -106,12 +106,12 @@ public class User {
         this.totalTimeElapsed = totalTimeElapsed;
     }
 
-    public double getWPM() {
-        return this.WPM;
+    public double getWpm() {
+        return this.wpm;
     }
 
-    public void setWPM(int WPM) {
-        this.WPM = WPM;
+    public void setWpm(int wpm) {
+        this.wpm = wpm;
     }
 
     public String getIdAsString() {
